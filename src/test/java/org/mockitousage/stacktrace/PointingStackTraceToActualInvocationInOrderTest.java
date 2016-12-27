@@ -5,18 +5,19 @@
 
 package org.mockitousage.stacktrace;
 
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.exceptions.verification.VerificationInOrderFailure;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.mockitousage.IMethods;
 import org.mockitoutil.TestBase;
+
+import static junit.framework.TestCase.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.*;
 
 //This is required to make sure stack trace is well filtered when runner is ON
 @RunWith(MockitoJUnitRunner.class)
@@ -58,7 +59,7 @@ public class PointingStackTraceToActualInvocationInOrderTest extends TestBase {
             inOrder.verify(mock).simpleMethod(999);
             fail();
         } catch (VerificationInOrderFailure e) {
-            assertContains("fourth(", e.getMessage());
+            assertThat(e).hasMessageContaining("fourth(");
         }
     }
     
@@ -70,7 +71,7 @@ public class PointingStackTraceToActualInvocationInOrderTest extends TestBase {
             inOrder.verify(mockTwo).simpleMethod(999);
             fail();
         } catch (VerificationInOrderFailure e) {
-            assertContains("third(", e.getMessage());
+            assertThat(e).hasMessageContaining("third(");
         }
     }
     
@@ -83,7 +84,7 @@ public class PointingStackTraceToActualInvocationInOrderTest extends TestBase {
             inOrder.verify(mockTwo, times(3)).simpleMethod(999);
             fail();
         } catch (VerificationInOrderFailure e) {
-            assertContains("second(", e.getMessage());
+            assertThat(e).hasMessageContaining("second(");
         }
     }
     
@@ -93,7 +94,7 @@ public class PointingStackTraceToActualInvocationInOrderTest extends TestBase {
             inOrder.verify(mock, times(0)).simpleMethod(anyInt());
             fail();
         } catch (VerificationInOrderFailure e) {
-            assertContains("first(", e.getMessage());
+            assertThat(e).hasMessageContaining("first(");
         }
     }    
     
@@ -105,7 +106,7 @@ public class PointingStackTraceToActualInvocationInOrderTest extends TestBase {
             inOrder.verify(mockTwo, times(0)).simpleMethod(anyInt());
             fail();
         } catch (VerificationInOrderFailure e) {
-            assertContains("second(", e.getMessage());
+            assertThat(e).hasMessageContaining("second(");
         }
     }
     
@@ -119,7 +120,7 @@ public class PointingStackTraceToActualInvocationInOrderTest extends TestBase {
             inOrder.verify(mockTwo, times(3)).simpleMethod(anyInt());
             fail();
         } catch (VerificationInOrderFailure e) {
-            assertContains("fourth(", e.getMessage());
+            assertThat(e).hasMessageContaining("fourth(");
         }
     }
 }

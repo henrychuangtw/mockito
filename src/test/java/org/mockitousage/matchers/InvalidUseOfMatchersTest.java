@@ -8,10 +8,9 @@ package org.mockitousage.matchers;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.AdditionalMatchers;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.exceptions.misusing.InvalidUseOfMatchersException;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.mockitousage.IMethods;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -19,10 +18,10 @@ import static org.junit.Assert.fail;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(MockitoJUnitRunner.Silent.class)
 public class InvalidUseOfMatchersTest {
 
-    @Mock private IMethods mock;
+    private IMethods mock = Mockito.mock(IMethods.class);
 
     @Test
     public void should_detect_wrong_number_of_matchers_when_stubbing() {
@@ -32,8 +31,8 @@ public class InvalidUseOfMatchersTest {
             fail();
         } catch (InvalidUseOfMatchersException e) {
             assertThat(e.getMessage())
-                      .contains("3 matchers expected")
-                      .contains("1 recorded");
+                    .contains("3 matchers expected")
+                    .contains("1 recorded");
         }
     }
 
@@ -47,7 +46,7 @@ public class InvalidUseOfMatchersTest {
             fail();
         } catch (InvalidUseOfMatchersException e) {
             assertThat(e.getMessage())
-                      .contains("Misplaced argument matcher detected here");
+                    .contains("Misplaced argument matcher detected here");
             e.printStackTrace();
         }
     }
@@ -90,8 +89,8 @@ public class InvalidUseOfMatchersTest {
             fail();
         } catch (InvalidUseOfMatchersException e) {
             assertThat(e.getMessage())
-                      .contains("3 matchers expected")
-                      .contains("1 recorded");
+                    .contains("3 matchers expected")
+                    .contains("1 recorded");
         }
     }
 }

@@ -5,16 +5,19 @@
 
 package org.mockitousage.stacktrace;
 
-import static org.mockito.Mockito.*;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.exceptions.verification.NeverWantedButInvoked;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.mockitousage.IMethods;
 import org.mockitoutil.TestBase;
+
+import static junit.framework.TestCase.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 //This is required to make sure stack trace is well filtered when runner is ON
 @RunWith(MockitoJUnitRunner.class)
@@ -50,7 +53,7 @@ public class PointingStackTraceToActualInvocationTest extends TestBase {
             verify(mock, times(0)).simpleMethod(1);
             fail();
         } catch (NeverWantedButInvoked e) {
-            assertContains("first(", e.getMessage());
+            assertThat(e).hasMessageContaining("first(");
         }
     }   
     
@@ -60,7 +63,7 @@ public class PointingStackTraceToActualInvocationTest extends TestBase {
             verify(mock, times(0)).simpleMethod(1);
             fail();
         } catch (NeverWantedButInvoked e) {
-            assertNotContains(".runners.", e.getMessage());
+            assertThat(e.getMessage()).doesNotContain(".runners.");
         }
     }   
 }

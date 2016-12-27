@@ -15,6 +15,8 @@ import org.mockito.exceptions.verification.junit.ArgumentsAreDifferent;
 import org.mockitousage.IMethods;
 import org.mockitoutil.TestBase;
 
+import static junit.framework.TestCase.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -50,7 +52,7 @@ public class HamcrestMatchersTest extends TestBase {
             verify(mock).simpleMethod(argThat(new ContainsX()));
             fail();
         } catch (ArgumentsAreDifferent e) {
-            assertContains("contains 'X'", e.getMessage());
+            assertThat(e).hasMessageContaining("contains 'X'");
         }
     }
 
@@ -86,6 +88,7 @@ public class HamcrestMatchersTest extends TestBase {
         verify(mock).oneArg(floatThat(is(6.0F)));
     }
 
+    @SuppressWarnings("rawtypes")
     private class NonGenericMatcher extends BaseMatcher {
         public boolean matches(Object o) {
             return true;
@@ -99,6 +102,7 @@ public class HamcrestMatchersTest extends TestBase {
         assertEquals(5, mock.intArgumentReturningInt(10));
     }
 
+    @SuppressWarnings("unchecked")
     private int nonGenericMatcher() {
         argThat(new NonGenericMatcher());
         return 0;
@@ -107,7 +111,7 @@ public class HamcrestMatchersTest extends TestBase {
     @Test
     public void coexists_with_mockito_matcher() {
         when(mock.simpleMethod(Mockito.argThat(new ArgumentMatcher<String>() {
-            public boolean matches(Object argument) {
+            public boolean matches(String argument) {
                 return true;
             }
         }))).thenReturn("x");

@@ -5,25 +5,24 @@
 
 package org.mockitousage.verification;
 
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import org.junit.Test;
+import org.mockito.Mockito;
+import org.mockitoutil.TestBase;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.junit.Test;
-import org.mockito.Mockito;
-import org.mockitoutil.TestBase;
+import static org.mockito.Mockito.*;
 
 @SuppressWarnings("unchecked")
 public class VerificationOnMultipleMocksUsingMatchersTest extends TestBase {
 
     @Test
     public void shouldVerifyUsingMatchers() throws Exception {
-        List list = Mockito.mock(List.class);
-        HashMap map = Mockito.mock(HashMap.class);
+        List<Object> list = Mockito.mock(List.class);
+        HashMap<Object, Object> map = Mockito.mock(HashMap.class);
         
         list.add("test");
         list.add(1, "test two");
@@ -42,9 +41,9 @@ public class VerificationOnMultipleMocksUsingMatchersTest extends TestBase {
     
     @Test
     public void shouldVerifyMultipleMocks() throws Exception {
-        List list = mock(List.class);
-        Map map = mock(Map.class);
-        Set set = mock(Set.class);
+        List<String> list = mock(List.class);
+        Map<Object, Integer> map = mock(Map.class);
+        Set<?> set = mock(Set.class);
 
         list.add("one");
         list.add("one");

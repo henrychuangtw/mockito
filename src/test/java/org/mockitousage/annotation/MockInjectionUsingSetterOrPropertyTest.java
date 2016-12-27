@@ -21,6 +21,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import static junit.framework.TestCase.*;
+
 @SuppressWarnings({"unchecked", "unused"})
 public class MockInjectionUsingSetterOrPropertyTest extends TestBase {
 
@@ -38,14 +40,13 @@ public class MockInjectionUsingSetterOrPropertyTest extends TestBase {
     @Spy @InjectMocks private SuperUnderTesting initializedSpy = new SuperUnderTesting();
     @Spy @InjectMocks private SuperUnderTesting notInitializedSpy;
 
-    @Mock private Map map;
-    @Mock private List list;
-    @Mock private Set histogram1;
-    @Mock private Set histogram2;
+    @Mock private Map<?, ?> map;
+    @Mock private List<?> list;
+    @Mock private Set<?> histogram1;
+    @Mock private Set<?> histogram2;
     @Mock private IMethods candidate2;
 
-    @Spy private TreeSet searchTree = new TreeSet();
-    private MockUtil mockUtil = new MockUtil();
+    @Spy private TreeSet<String> searchTree = new TreeSet<String>();
 
     @Before
     public void enforces_new_instances() {
@@ -66,14 +67,14 @@ public class MockInjectionUsingSetterOrPropertyTest extends TestBase {
     @Test
     public void should_inject_mocks_in_spy() {
         assertNotNull(initializedSpy.getAList());
-        assertTrue(mockUtil.isMock(initializedSpy));
+        assertTrue(MockUtil.isMock(initializedSpy));
     }
 
     @Test
     public void should_initialize_spy_if_null_and_inject_mocks() {
         assertNotNull(notInitializedSpy);
         assertNotNull(notInitializedSpy.getAList());
-        assertTrue(mockUtil.isMock(notInitializedSpy));
+        assertTrue(MockUtil.isMock(notInitializedSpy));
     }
 
     @Test
@@ -144,29 +145,29 @@ public class MockInjectionUsingSetterOrPropertyTest extends TestBase {
     }
 
     static class SuperUnderTesting {
-        private List aList;
+        private List<?> aList;
 
-        public List getAList() { return aList; }
+        public List<?> getAList() { return aList; }
     }
 
     static class BaseUnderTesting extends SuperUnderTesting {
-        private Map aMap;
+        private Map<?, ?> aMap;
 
-        public Map getAMap() { return aMap; }
+        public Map<?, ?> getAMap() { return aMap; }
     }
 
     static class OtherBaseUnderTesting extends SuperUnderTesting {
-        private TreeSet searchTree;
+        private TreeSet<?> searchTree;
 
-        public TreeSet getSearchTree() { return searchTree; }
+        public TreeSet<?> getSearchTree() { return searchTree; }
     }
 
     static class SubUnderTesting extends BaseUnderTesting {
-        private Set histogram1;
-        private Set histogram2;
+        private Set<?> histogram1;
+        private Set<?> histogram2;
 
-        public Set getHistogram1() { return histogram1; }
-        public Set getHistogram2() { return histogram2; }
+        public Set<?> getHistogram1() { return histogram1; }
+        public Set<?> getHistogram2() { return histogram2; }
     }
 
     static class HasTwoFieldsWithSameType {

@@ -4,13 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.net.URLConnection;
-import java.net.URLStreamHandler;
+import java.net.*;
 import java.util.*;
 
 import static java.util.Arrays.asList;
@@ -208,7 +202,7 @@ public abstract class ClassLoaders {
             this.inMemoryClassObjects = inMemoryClassObjects;
         }
 
-        protected Class findClass(String name) throws ClassNotFoundException {
+        protected Class<?> findClass(String name) throws ClassNotFoundException {
             byte[] classDefinition = inMemoryClassObjects.get(name);
             if (classDefinition != null) {
                 return defineClass(name, classDefinition, 0, classDefinition.length);

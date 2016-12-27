@@ -5,14 +5,6 @@
 
 package org.mockitousage;
 
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.willAnswer;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.verify;
-
-import java.util.Date;
-import java.util.GregorianCalendar;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -20,7 +12,15 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.mockitoutil.TestBase;
 
-@SuppressWarnings("unchecked")
+import java.util.Date;
+import java.util.GregorianCalendar;
+
+import static junit.framework.TestCase.assertEquals;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willAnswer;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.verify;
+
 public class PlaygroundWithDemoOfUnclonedParametersProblemTest extends TestBase {
 
     ImportManager importManager;
@@ -72,8 +72,8 @@ public class PlaygroundWithDemoOfUnclonedParametersProblemTest extends TestBase 
         verify(importLogDao).alter(any(ImportLogBean.class));
     }
 
-    private Answer byCheckingLogEquals(final ImportLogBean status) {
-        return new Answer() {
+    private Answer<Object> byCheckingLogEquals(final ImportLogBean status) {
+        return new Answer<Object>() {
             public Object answer(InvocationOnMock invocation) throws Throwable {
                 ImportLogBean bean =  invocation.getArgument(0);
                 assertEquals(status, bean);
@@ -134,7 +134,7 @@ public class PlaygroundWithDemoOfUnclonedParametersProblemTest extends TestBase 
     }
 
     private interface ImportLogDao {
-        public boolean anyImportRunningOrRunnedToday(int importType, Date currentDate);
+        boolean anyImportRunningOrRunnedToday(int importType, Date currentDate);
 
         void include(ImportLogBean importLogBean);
 

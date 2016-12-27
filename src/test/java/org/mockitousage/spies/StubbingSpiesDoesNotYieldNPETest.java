@@ -4,16 +4,15 @@
  */
 package org.mockitousage.spies;
 
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import org.junit.Test;
+import org.mockitoutil.TestBase;
 
 import java.util.Collection;
 import java.util.Map;
 
-import org.junit.Test;
-import org.mockitoutil.TestBase;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.spy;
 
-@SuppressWarnings("unchecked")
 public class StubbingSpiesDoesNotYieldNPETest extends TestBase {
     
     class Foo {
@@ -21,11 +20,11 @@ public class StubbingSpiesDoesNotYieldNPETest extends TestBase {
             return text.length();
         }
         
-        public int size(Map map) {
+        public int size(Map<?, ?> map) {
             return map.size();
         }
         
-        public int size(Collection collection) {
+        public int size(Collection<?> collection) {
             return collection.size();
         }
     }

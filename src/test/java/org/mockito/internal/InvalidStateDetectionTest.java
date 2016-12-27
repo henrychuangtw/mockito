@@ -5,9 +5,6 @@
 
 package org.mockito.internal;
 
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
-
 import org.junit.After;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -18,11 +15,14 @@ import org.mockito.exceptions.misusing.UnfinishedVerificationException;
 import org.mockitousage.IMethods;
 import org.mockitoutil.TestBase;
 
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.fail;
+import static org.mockito.Mockito.*;
+
 /**
  * invalid state happens if:
  * 
  *    -unfinished stubbing
- *    -unfinished stubVoid
  *    -unfinished doReturn()
  *    -stubbing without actual method call
  *    -verify without actual method call
@@ -35,7 +35,6 @@ import org.mockitoutil.TestBase;
  *    -on verifyNoMoreInteractions
  *    -on verify in order
  *    -on stub
- *    -on stubVoid
  */
 @SuppressWarnings({"unchecked", "deprecation"})
 public class InvalidStateDetectionTest extends TestBase {
@@ -56,9 +55,6 @@ public class InvalidStateDetectionTest extends TestBase {
         detectsAndCleansUp(new OnStub(), UnfinishedStubbingException.class);
         
         when(mock.simpleMethod());
-        detectsAndCleansUp(new OnStubVoid(), UnfinishedStubbingException.class);
-        
-        when(mock.simpleMethod());
         detectsAndCleansUp(new OnVerify(), UnfinishedStubbingException.class);
         
         when(mock.simpleMethod());
@@ -75,42 +71,12 @@ public class InvalidStateDetectionTest extends TestBase {
     }
     
     @Test
-    public void shouldDetectUnfinishedStubbingVoid() {
-        stubVoid(mock);
-        detectsAndCleansUp(new OnMethodCallOnMock(), UnfinishedStubbingException.class);
-        
-        stubVoid(mock);
-        detectsAndCleansUp(new OnStub(), UnfinishedStubbingException.class);
-        
-        stubVoid(mock);
-        detectsAndCleansUp(new OnStubVoid(), UnfinishedStubbingException.class);
-        
-        stubVoid(mock);
-        detectsAndCleansUp(new OnVerify(), UnfinishedStubbingException.class);
-        
-        stubVoid(mock);
-        detectsAndCleansUp(new OnVerifyInOrder(), UnfinishedStubbingException.class);
-        
-        stubVoid(mock);
-        detectsAndCleansUp(new OnVerifyZeroInteractions(), UnfinishedStubbingException.class);
-        
-        stubVoid(mock);
-        detectsAndCleansUp(new OnVerifyNoMoreInteractions(), UnfinishedStubbingException.class);
-        
-        stubVoid(mock);
-        detectsAndCleansUp(new OnDoAnswer(), UnfinishedStubbingException.class);
-    }
-    
-    @Test
     public void shouldDetectUnfinishedDoAnswerStubbing() {
         doAnswer(null);
         detectsAndCleansUp(new OnMethodCallOnMock(), UnfinishedStubbingException.class);
         
         doAnswer(null);
         detectsAndCleansUp(new OnStub(), UnfinishedStubbingException.class);
-        
-        doAnswer(null);
-        detectsAndCleansUp(new OnStubVoid(), UnfinishedStubbingException.class);
         
         doAnswer(null);
         detectsAndCleansUp(new OnVerify(), UnfinishedStubbingException.class);
@@ -134,9 +100,6 @@ public class InvalidStateDetectionTest extends TestBase {
         detectsAndCleansUp(new OnStub(), UnfinishedVerificationException.class);
         
         verify(mock);
-        detectsAndCleansUp(new OnStubVoid(), UnfinishedVerificationException.class);
-        
-        verify(mock);
         detectsAndCleansUp(new OnVerify(), UnfinishedVerificationException.class);
         
         verify(mock);
@@ -153,10 +116,7 @@ public class InvalidStateDetectionTest extends TestBase {
     }
 
     @Test
-    public void shouldDetectMisplacedArgumentMatcher() {
-        anyObject();
-        detectsAndCleansUp(new OnStubVoid(), InvalidUseOfMatchersException.class);
-        
+    public void shouldDetectMisplacedArgumentMatcher() {      
         anyObject();
         detectsAndCleansUp(new OnVerify(), InvalidUseOfMatchersException.class);
         
@@ -175,14 +135,14 @@ public class InvalidStateDetectionTest extends TestBase {
     
     @Test
     public void shouldCorrectStateAfterDetectingUnfinishedStubbing() {
-        stubVoid(mock).toThrow(new RuntimeException());
+        doThrow(new RuntimeException()).when(mock);
         
         try {
-            stubVoid(mock).toThrow(new RuntimeException()).on().oneArg(true);
+        	doThrow(new RuntimeException()).when(mock).oneArg(true);
             fail();
         } catch (UnfinishedStubbingException e) {}
         
-        stubVoid(mock).toThrow(new RuntimeException()).on().oneArg(true);
+        doThrow(new RuntimeException()).when(mock).oneArg(true);
         try {
             mock.oneArg(true);
             fail();
@@ -242,12 +202,6 @@ public class InvalidStateDetectionTest extends TestBase {
         }
     }
     
-    private static class OnStubVoid implements DetectsInvalidState {
-        public void detect(IMethods mock) {
-            stubVoid(mock);
-        }
-    }
-    
     private static class OnMethodCallOnMock implements DetectsInvalidState {
         public void detect(IMethods mock) {
             mock.simpleMethod();
@@ -266,7 +220,7 @@ public class InvalidStateDetectionTest extends TestBase {
         }
     }
     
-    private void detectsAndCleansUp(DetectsInvalidState detector, Class expected) {
+    private void detectsAndCleansUp(DetectsInvalidState detector, Class<?> expected) {
         try {
             detector.detect(mock);
             fail("Should throw an exception");

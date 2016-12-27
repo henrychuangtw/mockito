@@ -5,17 +5,19 @@
 
 package org.mockitousage.annotation;
 
-import static org.mockito.Mockito.*;
-
-import java.util.LinkedList;
-import java.util.List;
-
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockitousage.IMethods;
 import org.mockitoutil.TestBase;
+
+import java.util.LinkedList;
+import java.util.List;
+
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertSame;
+import static org.mockito.Mockito.verify;
 
 @SuppressWarnings("unchecked")
 public class CaptorAnnotationBasicTest extends TestBase {
@@ -39,7 +41,7 @@ public class CaptorAnnotationBasicTest extends TestBase {
     }
 
     public interface PeopleRepository {
-        public void save(Person capture);
+        void save(Person capture);
     }
     
     @Mock PeopleRepository peopleRepository;           
@@ -73,6 +75,7 @@ public class CaptorAnnotationBasicTest extends TestBase {
         assertEquals("Williams", captor.getValue().getSurname());
     }
         
+    @SuppressWarnings("rawtypes")
     @Captor ArgumentCaptor genericLessCaptor;
     
     @Test

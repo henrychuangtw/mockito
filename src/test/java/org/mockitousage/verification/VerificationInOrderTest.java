@@ -5,9 +5,6 @@
 
 package org.mockitousage.verification;
 
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
@@ -15,6 +12,10 @@ import org.mockito.exceptions.verification.VerificationInOrderFailure;
 import org.mockito.exceptions.verification.WantedButNotInvoked;
 import org.mockitousage.IMethods;
 import org.mockitoutil.TestBase;
+
+import static junit.framework.TestCase.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.*;
 
 public class VerificationInOrderTest extends TestBase {
     
@@ -59,7 +60,7 @@ public class VerificationInOrderTest extends TestBase {
             inOrder.verify(mockOne, atLeastOnce()).differentMethod();
             fail();
         } catch (WantedButNotInvoked e) {
-            assertContains("differentMethod()", e.getMessage());
+            assertThat(e).hasMessageContaining("differentMethod()");
         }
     }
     

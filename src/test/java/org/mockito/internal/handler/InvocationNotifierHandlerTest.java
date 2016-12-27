@@ -7,17 +7,17 @@ package org.mockito.internal.handler;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.exceptions.base.MockitoException;
 import org.mockito.internal.creation.MockSettingsImpl;
-import org.mockito.internal.listeners.NotifiedMethodInvocationReport;
 import org.mockito.invocation.Invocation;
 import org.mockito.listeners.InvocationListener;
 import org.mockito.listeners.MethodInvocationReport;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.mock.MockCreationSettings;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
-import org.mockitousage.IMethods;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -27,7 +27,6 @@ import static org.junit.Assert.fail;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willThrow;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyList;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -38,7 +37,7 @@ public class InvocationNotifierHandlerTest {
     private static final String SOME_LOCATION = "some location";
     private static final RuntimeException SOME_EXCEPTION = new RuntimeException();
     private static final OutOfMemoryError SOME_ERROR = new OutOfMemoryError();
-    private static final Answer SOME_ANSWER = mock(Answer.class);
+    private static final Answer<?> SOME_ANSWER = mock(Answer.class);
 
 
     @Mock private InvocationListener listener1;
@@ -46,15 +45,15 @@ public class InvocationNotifierHandlerTest {
     @Spy private CustomListener customListener;
 
     @Mock private Invocation invocation;
-    @Mock private MockHandlerImpl mockHandler;
+    @Mock private MockHandlerImpl<ArrayList<Answer<?>>> mockHandler;
 
-    private InvocationNotifierHandler notifier;
+    private InvocationNotifierHandler<ArrayList<Answer<?>>> notifier;
 
     @Before
     public void setUp() throws Exception {
-        notifier = new InvocationNotifierHandler(
+        notifier = new InvocationNotifierHandler<ArrayList<Answer<?>>>(
                 mockHandler,
-                (MockSettingsImpl) new MockSettingsImpl().invocationListeners(customListener, listener1, listener2)
+                (MockCreationSettings<ArrayList<Answer<?>>>) new MockSettingsImpl<ArrayList<Answer<?>>>().invocationListeners(customListener, listener1, listener2)
         );
     }
 
@@ -122,13 +121,11 @@ public class InvocationNotifierHandlerTest {
     public void should_delegate_all_MockHandlerInterface_to_the_parameterized_MockHandler() throws Exception {
         notifier.getInvocationContainer();
         notifier.getMockSettings();
-        notifier.voidMethodStubbable(mock(IMethods.class));
-        notifier.setAnswersForStubbing(new ArrayList<Answer>());
+        notifier.setAnswersForStubbing(new ArrayList<Answer<?>>());
 
         verify(mockHandler).getInvocationContainer();
         verify(mockHandler).getMockSettings();
-        verify(mockHandler).voidMethodStubbable(any());
-        verify(mockHandler).setAnswersForStubbing(anyList());
+        verify(mockHandler).setAnswersForStubbing(ArgumentMatchers.<Answer<?>>anyList());
     }
 
     private static class CustomListener implements InvocationListener {

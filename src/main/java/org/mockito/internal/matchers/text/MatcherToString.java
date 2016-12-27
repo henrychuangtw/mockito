@@ -1,8 +1,14 @@
+/*
+ * Copyright (c) 2016 Mockito contributors
+ * This program is made available under the terms of the MIT License.
+ */
 package org.mockito.internal.matchers.text;
 
 import org.mockito.ArgumentMatcher;
 import org.mockito.internal.util.Decamelizer;
 import org.mockito.internal.util.ObjectMethodsGuru;
+
+import static org.mockito.internal.util.ObjectMethodsGuru.isToStringMethod;
 
 import java.lang.reflect.Method;
 
@@ -21,13 +27,12 @@ class MatcherToString {
      * @param matcher
      * @return
      */
-    static String toString(ArgumentMatcher matcher) {
-        ObjectMethodsGuru guru = new ObjectMethodsGuru();
-        Class cls = matcher.getClass();
+    static String toString(ArgumentMatcher<?> matcher) {
+        Class<?> cls = matcher.getClass();
         while(cls != Object.class) {
             Method[] methods = cls.getDeclaredMethods();
             for (Method m : methods) {
-                if(guru.isToString(m)) {
+                if(isToStringMethod(m)) {
                     return matcher.toString();
                 }
             }

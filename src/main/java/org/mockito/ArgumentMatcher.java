@@ -1,8 +1,12 @@
+/*
+ * Copyright (c) 2016 Mockito contributors
+ * This program is made available under the terms of the MIT License.
+ */
 package org.mockito;
 
 /**
  * Allows creating customized argument matchers.
- * This API was changed in Mockito 2.* in an effort to decouple Mockito from Hamcrest
+ * This API was changed in Mockito 2.1.0 in an effort to decouple Mockito from Hamcrest
  * and reduce the risk of version incompatibility.
  * Migration guide is included close to the bottom of this javadoc.
  * <p>
@@ -35,6 +39,8 @@ package org.mockito;
  *     Useful if you already have a hamcrest matcher. Reuse and win!
  *     Note that {@link org.mockito.hamcrest.MockitoHamcrest#argThat(org.hamcrest.Matcher)} demonstrates <b>NullPointerException</b> auto-unboxing caveat.
  *     </li>
+ *     <li>Java 8 only - use a lambda in place of an {@link ArgumentMatcher} since {@link ArgumentMatcher}
+ *     is effectively a functional interface. A lambda can be used with the {@link Mockito#argThat} method.</li>
  * </ul>
  *
  * <p>
@@ -44,8 +50,8 @@ package org.mockito;
  *
  * <pre class="code"><code class="java">
  * class ListOfTwoElements implements ArgumentMatcher&lt;List&gt; {
- *     public boolean matches(Object list) {
- *         return ((List) list).size() == 2;
+ *     public boolean matches(List list) {
+ *         return list.size() == 2;
  *     }
  *     public String toString() {
  *         //printed in verification errors
@@ -70,9 +76,16 @@ package org.mockito;
  *   verify(mock).addAll(<b>listOfTwoElements()</b>);
  * </code></pre>
  *
+ * In Java 8 you can treat ArgumentMatcher as a functional interface
+ * and use a lambda, e.g.:
+ *
+ * <pre class="code"><code class="java">
+ *   verify(mock).addAll(<b>argThat(list -> list.size() == 2)</b>);
+ * </code></pre>
+ *
  * <p>
  * Read more about other matchers in javadoc for {@link Matchers} class.
- * <h2>2.0 migration guide</h2>
+ * <h2>2.1.0 migration guide</h2>
  *
  * All existing custom implementations of <code>ArgumentMatcher</code> will no longer compile.
  * All locations where hamcrest matchers are passed to <code>argThat()</code> will no longer compile.
@@ -86,6 +99,7 @@ package org.mockito;
  * b) Use <code>org.mockito.hamcrest.MockitoHamcrest.argThat()</code> instead of <code>Mockito.argThat()</code>.
  * Ensure that there is <a href="http://hamcrest.org/JavaHamcrest/">hamcrest</a> dependency on classpath
  * (Mockito does not depend on hamcrest any more).
+ *
  * </li>
  * </ul>
  * What option is right for you? If you don't mind compile dependency to hamcrest
@@ -94,7 +108,7 @@ package org.mockito;
  * you can choose different option in future (and refactor the code)
  *
  * @param <T> type of argument
- * @since 2.0
+ * @since 2.1.0
  */
 public interface ArgumentMatcher<T> {
 
@@ -104,27 +118,11 @@ public interface ArgumentMatcher<T> {
      * The method should <b>never</b> assert if the argument doesn't match. It
      * should only return false.
      * <p>
-     * The argument is not using the generic type in order to force explicit casting in the implementation.
-     * This way it is easier to debug when incompatible arguments are passed to the matchers.
-     * You have to trust us on this one. If we used parametrized type then <code>ClassCastException</code>
-     * would be thrown in certain scenarios.
-     * For example:
-     *
-     * <pre class="code"><code class="java">
-     *   //test, method accepts Collection argument and ArgumentMatcher&lt;List&gt; is used
-     *   when(mock.useCollection(someListMatcher())).thenDoNothing();
-     *
-     *   //production code, yields confusing ClassCastException
-     *   //although Set extends Collection but is not compatible with ArgumentMatcher&lt;List&gt;
-     *   mock.useCollection(new HashSet());
-     * </pre>
-     *
-     * <p>
      * See the example in the top level javadoc for {@link ArgumentMatcher}
      *
      * @param argument
      *            the argument
      * @return true if this matcher accepts the given argument.
      */
-    public boolean matches(Object argument);
+    boolean matches(T argument);
 }

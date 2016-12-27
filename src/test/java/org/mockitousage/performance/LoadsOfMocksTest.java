@@ -5,23 +5,23 @@
 
 package org.mockitousage.performance;
 
-import static org.mockito.Mockito.*;
-
-import java.util.LinkedList;
-import java.util.List;
-
 import org.junit.Ignore;
 import org.junit.Test;
 import org.mockitousage.IMethods;
 import org.mockitoutil.TestBase;
 
-@SuppressWarnings("unchecked")
+import java.util.LinkedList;
+import java.util.List;
+
+import static junit.framework.TestCase.assertEquals;
+import static org.mockito.Mockito.*;
+
 public class LoadsOfMocksTest extends TestBase {
 
     @Ignore("Use it for performance checks")
     @Test
     public void testSomething() {
-        List mocks = new LinkedList();
+        List<IMethods> mocks = new LinkedList<IMethods>();
         for (int i = 0; i < 50000; i++) {
             System.out.println("Mock no: " + i);
             IMethods mock = mock(IMethods.class);

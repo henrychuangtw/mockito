@@ -10,11 +10,14 @@ import org.junit.internal.TextListener;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.Result;
 import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.mockitoutil.TestBase;
 
 import java.io.OutputStream;
 import java.io.PrintStream;
+
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertFalse;
 
 
 // @Ignore("for demo only. this test cannot be enabled as it fails :)")

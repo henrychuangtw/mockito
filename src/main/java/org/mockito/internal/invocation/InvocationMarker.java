@@ -6,23 +6,26 @@ package org.mockito.internal.invocation;
 
 import org.mockito.internal.verification.api.InOrderContext;
 import org.mockito.invocation.Invocation;
+import org.mockito.invocation.MatchableInvocation;
 
 import java.util.List;
 
 public class InvocationMarker {
 
-    public void markVerified(List<Invocation> invocations, CapturesArgumentsFromInvocation wanted) {
+    private InvocationMarker(){}
+	
+    public static void markVerified(List<Invocation> invocations, MatchableInvocation wanted) {
         for (Invocation invocation : invocations) {
             markVerified(invocation, wanted);
         }
     }
 
-    public void markVerified(Invocation invocation, CapturesArgumentsFromInvocation wanted) {
+    public static void markVerified(Invocation invocation, MatchableInvocation wanted) {
         invocation.markVerified();
         wanted.captureArgumentsFrom(invocation);
     }
 
-    public void markVerifiedInOrder(List<Invocation> chunk, CapturesArgumentsFromInvocation wanted, InOrderContext context) {
+    public static void markVerifiedInOrder(List<Invocation> chunk, MatchableInvocation wanted, InOrderContext context) {
         markVerified(chunk, wanted);
 
         for (Invocation i : chunk) {

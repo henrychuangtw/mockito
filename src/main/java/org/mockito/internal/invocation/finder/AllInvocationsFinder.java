@@ -5,34 +5,47 @@
 
 package org.mockito.internal.invocation.finder;
 
-import org.mockito.internal.InternalMockHandler;
-import org.mockito.internal.util.MockUtil;
+import org.mockito.internal.invocation.InvocationComparator;
+import org.mockito.stubbing.Stubbing;
+import org.mockito.internal.stubbing.StubbingComparator;
+import org.mockito.internal.util.DefaultMockingDetails;
 import org.mockito.invocation.Invocation;
 
 import java.util.*;
 
 public class AllInvocationsFinder {
-    
+
+    private AllInvocationsFinder() {}
+
     /**
      * gets all invocations from mocks. Invocations are ordered earlier first. 
      * 
      * @param mocks mocks
      * @return invocations
      */
-    public List<Invocation> find(List<?> mocks) {
-        Set<Invocation> invocationsInOrder = new TreeSet<Invocation>(new SequenceNumberComparator());
+    public static List<Invocation> find(Iterable<?> mocks) {
+        Set<Invocation> invocationsInOrder = new TreeSet<Invocation>(new InvocationComparator());
         for (Object mock : mocks) {
-            InternalMockHandler<Object> handler = new MockUtil().getMockHandler(mock);
-            List<Invocation> fromSingleMock = handler.getInvocationContainer().getInvocations();
+            Collection<Invocation> fromSingleMock = new DefaultMockingDetails(mock).getInvocations();
             invocationsInOrder.addAll(fromSingleMock);
         }
         
         return new LinkedList<Invocation>(invocationsInOrder);
     }
 
-    private static final class SequenceNumberComparator implements Comparator<Invocation> {
-        public int compare(Invocation o1, Invocation o2) {
-            return Integer.valueOf(o1.getSequenceNumber()).compareTo(o2.getSequenceNumber());
+    /**
+     * Gets all stubbings from mocks. Invocations are ordered earlier first.
+     *
+     * @param mocks mocks
+     * @return stubbings
+     */
+    public static Set<Stubbing> findStubbings(Iterable<?> mocks) {
+        Set<Stubbing> stubbings = new TreeSet<Stubbing>(new StubbingComparator());
+        for (Object mock : mocks) {
+            Collection<? extends Stubbing> fromSingleMock = new DefaultMockingDetails(mock).getStubbings();
+            stubbings.addAll(fromSingleMock);
         }
+
+        return stubbings;
     }
 }

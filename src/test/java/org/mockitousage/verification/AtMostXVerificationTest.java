@@ -5,11 +5,6 @@
 
 package org.mockitousage.verification;
 
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
-
-import java.util.List;
-
 import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mock;
@@ -18,10 +13,16 @@ import org.mockito.exceptions.base.MockitoException;
 import org.mockito.exceptions.verification.NoInteractionsWanted;
 import org.mockitoutil.TestBase;
 
-@SuppressWarnings("unchecked")
+import java.util.List;
+
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.*;
+
 public class AtMostXVerificationTest extends TestBase {
 
-    @Mock private List mock;
+    @Mock private List<String> mock;
     
     @Test
     public void shouldVerifyAtMostXTimes() throws Exception {
@@ -104,7 +105,7 @@ public class AtMostXVerificationTest extends TestBase {
             verifyNoMoreInteractions(mock);
             fail();
         } catch(NoInteractionsWanted e) {
-            assertContains("undesiredInteraction(", e.getMessage());
+            assertThat(e).hasMessageContaining("undesiredInteraction(");
         }
     }
 

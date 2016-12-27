@@ -5,12 +5,12 @@
 
 package org.mockito.internal.invocation;
 
-import org.mockito.exceptions.Reporter;
-import org.mockito.internal.debugging.LocationImpl;
 import org.mockito.internal.exceptions.VerificationAwareInvocation;
 import org.mockito.internal.invocation.realmethod.RealMethod;
 import org.mockito.internal.reporting.PrintSettings;
 import org.mockito.invocation.*;
+
+import static org.mockito.internal.exceptions.Reporter.cannotCallAbstractRealMethod;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -63,16 +63,9 @@ public class InvocationImpl implements Invocation, VerificationAwareInvocation {
         return arguments;
     }
 
-    @Deprecated
-    public <T> T getArgumentAt(int index, Class<T> clazz) {
-        return (T) getArgument(index);
-    }
-
     public <T> T getArgument(int index) {
         return (T)arguments[index];
     }
-
-
 
     public boolean isVerified() {
         return verified || isIgnoredForVerification;
@@ -119,7 +112,7 @@ public class InvocationImpl implements Invocation, VerificationAwareInvocation {
 
     public Object callRealMethod() throws Throwable {
         if (method.isAbstract()) {
-            new Reporter().cannotCallAbstractRealMethod();
+            throw cannotCallAbstractRealMethod();
         }
         return realMethod.invoke(mock, rawArguments);
     }

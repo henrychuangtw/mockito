@@ -4,15 +4,6 @@
  */
 package org.mockitousage.annotation;
 
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import java.util.AbstractList;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
 import org.assertj.core.api.Assertions;
 import org.junit.Rule;
 import org.junit.Test;
@@ -23,10 +14,16 @@ import org.mockito.Spy;
 import org.mockito.exceptions.base.MockitoException;
 import org.mockitoutil.TestBase;
 
+import java.util.*;
+
+import static junit.framework.TestCase.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.*;
+
 @SuppressWarnings({"unchecked", "unused"})
 public class SpyAnnotationTest extends TestBase {
 
-    @Spy final List spiedList = new ArrayList();
+    @Spy final List<String> spiedList = new ArrayList<String>();
 
     @Spy NestedClassWithNoArgConstructor staticTypeWithNoArgConstructor;
 
@@ -172,7 +169,7 @@ public class SpyAnnotationTest extends TestBase {
             MockitoAnnotations.initMocks(new WithSpy());
             fail();
         } catch (MockitoException e) {
-            assertContains("@Spy annotation can only initialize inner classes", e.getMessage());
+            assertThat(e).hasMessageContaining("@Spy annotation can only initialize inner classes");
         }
     }
 

@@ -5,9 +5,23 @@
 
 package org.mockitousage.annotation;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.when;
+import static org.mockito.MockitoAnnotations.initMocks;
+
+import java.util.AbstractCollection;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.internal.TextListener;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.JUnitCore;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -16,24 +30,14 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.mockito.exceptions.base.MockitoException;
 import org.mockito.internal.util.MockUtil;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
+import org.mockitousage.IMethods;
 import org.mockitousage.examples.use.ArticleCalculator;
 import org.mockitousage.examples.use.ArticleDatabase;
 import org.mockitousage.examples.use.ArticleManager;
 
-import java.util.List;
-import java.util.Set;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-import static org.mockito.Mockito.when;
-
 @RunWith(MockitoJUnitRunner.class)
 public class MockInjectionUsingConstructorTest {
-    private MockUtil mockUtil = new MockUtil();
 
     @Mock private ArticleCalculator calculator;
     @Mock private ArticleDatabase database;
@@ -41,8 +45,8 @@ public class MockInjectionUsingConstructorTest {
     @InjectMocks private ArticleManager articleManager;
     @Spy @InjectMocks private ArticleManager spiedArticleManager;
 
-
-//    @InjectMocks private ArticleVisitor should_be_initialized_3_times;
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
 
     @Test
     public void shouldNotFailWhenNotInitialized() {
@@ -77,8 +81,8 @@ public class MockInjectionUsingConstructorTest {
 
     @Test
     public void objects_created_with_constructor_initialization_can_be_spied() throws Exception {
-        assertFalse(mockUtil.isMock(articleManager));
-        assertTrue(mockUtil.isMock(spiedArticleManager));
+        assertFalse(MockUtil.isMock(articleManager));
+        assertTrue(MockUtil.isMock(spiedArticleManager));
     }
 
     @Test
@@ -98,7 +102,7 @@ public class MockInjectionUsingConstructorTest {
     public static class junit_test_with_3_tests_methods {
         private static int constructor_instantiation = 0;
 
-        @Mock List some_collaborator;
+        @Mock List<?> some_collaborator;
         @InjectMocks some_class_with_parametered_constructor should_be_initialized_3_times;
 
         @Test public void test_1() { }
@@ -106,23 +110,109 @@ public class MockInjectionUsingConstructorTest {
         @Test public void test_3() { }
 
         private static class some_class_with_parametered_constructor {
-            public some_class_with_parametered_constructor(List collaborator) {
+            public some_class_with_parametered_constructor(List<?> collaborator) {
                 constructor_instantiation++;
             }
         }
     }
 
     private static class FailingConstructor {
-        FailingConstructor(Set set) {
+        FailingConstructor(Set<?> set) {
             throw new IllegalStateException("always fail");
         }
     }
 
     @Ignore("don't run this code in the test runner")
     private static class ATest {
-        @Mock Set set;
+        @Mock Set<?> set;
         @InjectMocks FailingConstructor failingConstructor;
     }
 
+    
+    @Test
+    public void injectMocksMustFailWithInterface() throws Exception {
+        class TestCase {
+            @InjectMocks
+            IMethods f;
+        }
+
+        exception.expect(MockitoException.class);
+        exception.expectMessage("Cannot instantiate @InjectMocks field named 'f'! Cause: the type 'IMethods' is an interface");
+
+        
+        initMocks(new TestCase());
+    }
+    
+    @Test
+    public void injectMocksMustFailWithEnum() throws Exception {
+        class TestCase {
+            @InjectMocks
+            TimeUnit f;
+        }
+
+        exception.expect(MockitoException.class);
+        exception.expectMessage("Cannot instantiate @InjectMocks field named 'f'! Cause: the type 'TimeUnit' is an enum");
+        
+        initMocks(new TestCase());
+    }
+    
+    @Test
+    public void injectMocksMustFailWithAbstractClass() throws Exception {
+        class TestCase {
+            @InjectMocks
+            AbstractCollection<?> f;
+        }
+
+        exception.expect(MockitoException.class);
+        exception.expectMessage("Cannot instantiate @InjectMocks field named 'f'! Cause: the type 'AbstractCollection' is an abstract class");
+        
+        initMocks(new TestCase());
+    }
+    
+    @Test
+    public void injectMocksMustFailWithNonStaticInnerClass() throws Exception {
+        class TestCase {
+            class InnerClass {}
+            @InjectMocks
+            InnerClass f;
+        }
+        
+
+        exception.expect(MockitoException.class);
+        exception.expectMessage("Cannot instantiate @InjectMocks field named 'f'! Cause: the type 'InnerClass' is an inner non static class");
+        
+        initMocks(new TestCase());
+    }
+    
+    static class  StaticInnerClass {}
+    @Test
+    public void injectMocksMustSucceedWithStaticInnerClass() throws Exception {
+        class TestCase {
+            @InjectMocks
+            StaticInnerClass f;
+        }
+
+        TestCase testClass = new TestCase();
+        initMocks(testClass);
+        
+        assertThat(testClass.f).isInstanceOf(StaticInnerClass.class);
+    }
+   
+    @Test
+    public void injectMocksMustSucceedWithInstance() throws Exception {
+        class TestCase {
+            @InjectMocks
+            StaticInnerClass f = new StaticInnerClass();
+        }
+
+        TestCase testClass = new TestCase();
+        StaticInnerClass original = testClass.f;
+        initMocks(testClass);
+        
+        assertThat(testClass.f).isSameAs(original);
+    }
+   
+    
+   
 
 }

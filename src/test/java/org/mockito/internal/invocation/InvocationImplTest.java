@@ -5,6 +5,7 @@
 
 package org.mockito.internal.invocation;
 
+import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.exceptions.base.MockitoException;
@@ -19,6 +20,8 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static junit.framework.TestCase.*;
 
 @SuppressWarnings({"unchecked"})
 public class InvocationImplTest extends TestBase {
@@ -53,7 +56,7 @@ public class InvocationImplTest extends TestBase {
     
     @Test
     public void shouldBeACitizenOfHashes() {
-        Map map = new HashMap();
+        Map<Invocation, String> map = new HashMap<Invocation, String>();
         map.put(invocation, "one");
         assertEquals("one", map.get(invocation));
     }
@@ -67,45 +70,45 @@ public class InvocationImplTest extends TestBase {
     @Test
     public void shouldPrintMethodArgs() {
         invocation = new InvocationBuilder().args("foo").toInvocation();
-        assertThat(invocation.toString(), endsWith("simpleMethod(\"foo\");"));
+        Assertions.assertThat(invocation.toString()).endsWith("simpleMethod(\"foo\");");
     }
     
     @Test
     public void shouldPrintMethodIntegerArgAndString() {
         invocation = new InvocationBuilder().args("foo", 1).toInvocation();
-        assertThat(invocation.toString(), endsWith("simpleMethod(\"foo\", 1);"));
+        Assertions.assertThat(invocation.toString()).endsWith("simpleMethod(\"foo\", 1);");
     }
     
     @Test
     public void shouldPrintNull() {
         invocation = new InvocationBuilder().args((String) null).toInvocation();
-        assertThat(invocation.toString(), endsWith("simpleMethod(null);"));
+        Assertions.assertThat(invocation.toString()).endsWith("simpleMethod(null);");
     }
     
     @Test
     public void shouldPrintArray() {
         invocation = new InvocationBuilder().method("oneArray").args(new int[] { 1, 2, 3 }).toInvocation();
-        assertThat(invocation.toString(), endsWith("oneArray([1, 2, 3]);"));
+        Assertions.assertThat(invocation.toString()).endsWith("oneArray([1, 2, 3]);");
     }
     
     @Test
     public void shouldPrintNullIfArrayIsNull() throws Exception {
         Method m = IMethods.class.getMethod("oneArray", Object[].class);
         invocation = new InvocationBuilder().method(m).args((Object) null).toInvocation();
-        assertThat(invocation.toString(), endsWith("oneArray(null);"));
+        Assertions.assertThat(invocation.toString()).endsWith("oneArray(null);");
     }
     
     @Test
     public void shouldPrintArgumentsInMultilinesWhenGetsTooBig() {
         invocation = new InvocationBuilder().args("veeeeery long string that makes it ugly in one line", 1).toInvocation();
-        assertThat(invocation.toString(), endsWith(
+        Assertions.assertThat(invocation.toString()).endsWith(
                 "simpleMethod(" +
                         "\n" +
                         "    \"veeeeery long string that makes it ugly in one line\"," +
                         "\n" +
                         "    1" +
                         "\n" +
-                        ");"));
+                        ");");
     }
     
     @Test
@@ -156,7 +159,7 @@ public class InvocationImplTest extends TestBase {
             argTypes(int.class, int.class).args(1, argument).toInvocation();
 
         //when
-        int secondArgument = invocationOnInterface.getArgument(1);
+        int secondArgument = (Integer) invocationOnInterface.getArgument(1);
 
         //then
         assertTrue(secondArgument == argument);

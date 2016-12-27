@@ -5,7 +5,6 @@
 package org.mockito.stubbing;
 
 import org.mockito.Mockito;
-import org.mockito.internal.progress.IOngoingStubbing;
 
 /**
  * Simply put: "<b>When</b> the x method is called <b>then</b> return y". E.g:
@@ -32,7 +31,7 @@ import org.mockito.internal.progress.IOngoingStubbing;
  *
  * See examples in javadoc for {@link Mockito#when}
  */
-public interface OngoingStubbing<T> extends IOngoingStubbing {
+public interface OngoingStubbing<T> {
 
     /**
      * Sets a return value to be returned when the method is called. E.g:
@@ -102,11 +101,15 @@ public interface OngoingStubbing<T> extends IOngoingStubbing {
      * If throwable is null then exception will be thrown.
      * <p>
      * See examples in javadoc for {@link Mockito#when}
+     * 
+     * <p>Note depending on the JVM, stack trace information may not be available in
+     * the generated throwable instance.  If you require stack trace information,
+     * use {@link OngoingStubbing#thenThrow(Throwable...)} instead.
      *
      * @param throwableType to be thrown on method invocation
      *
      * @return iOngoingStubbing object that allows stubbing consecutive calls
-     * @since 2.0.0
+     * @since 2.1.0
      */
     OngoingStubbing<T> thenThrow(Class<? extends Throwable> throwableType);
 
@@ -129,15 +132,17 @@ public interface OngoingStubbing<T> extends IOngoingStubbing {
      * <p>
      * See examples in javadoc for {@link Mockito#when}
      *
-     *
      * <p>Note since JDK 7, invoking this method will raise a compiler warning "possible heap pollution",
      * this API is safe to use. If you don't want to see this warning it is possible to chain {@link #thenThrow(Class)}
+     * <p>Note depending on the JVM, stack trace information may not be available in
+     * the generated throwable instance.  If you require stack trace information,
+     * use {@link OngoingStubbing#thenThrow(Throwable...)} instead.
      *
      * @param toBeThrown to be thrown on method invocation
      * @param nextToBeThrown next to be thrown on method invocation
      *
      * @return iOngoingStubbing object that allows stubbing consecutive calls
-     * @since 2.0.0
+     * @since 2.1.0
      */
     // Additional method helps users of JDK7+ to hide heap pollution / unchecked generics array creation warnings (on call site)
     @SuppressWarnings ({"unchecked", "varargs"})

@@ -5,14 +5,15 @@
 
 package org.mockitousage.matchers;
 
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.exceptions.verification.WantedButNotInvoked;
 import org.mockitousage.IMethods;
 import org.mockitoutil.TestBase;
+
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.fail;
+import static org.mockito.Mockito.*;
 
 public class VerificationAndStubbingUsingMatchersTest extends TestBase {
     private IMethods one;
@@ -47,10 +48,9 @@ public class VerificationAndStubbingUsingMatchersTest extends TestBase {
         } catch (RuntimeException e) {}
     }
     
-    @SuppressWarnings("deprecation")
     @Test
     public void shouldVerifyUsingMatchers() {
-        stubVoid(one).toThrow(new RuntimeException()).on().oneArg(true);
+        doThrow(new RuntimeException()).when(one).oneArg(true);
         when(three.varargsObject(5, "first arg", "second arg")).thenReturn("stubbed");
 
         try {

@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2016 Mockito contributors
+ * This program is made available under the terms of the MIT License.
+ */
 package org.mockito.internal.verification;
 
 import org.mockito.exceptions.base.MockitoAssertionError;
@@ -8,7 +12,7 @@ import org.mockito.verification.VerificationMode;
  * Description verification mode wraps an existing verification mode and prepends
  * a custom message to the assertion error if verification fails.
  * @author Geoff.Schoeman
- * @since 2.0.0
+ * @since 2.1.0
  */
 public class Description implements VerificationMode {
 
@@ -28,7 +32,7 @@ public class Description implements VerificationMode {
     /**
      * Performs verification using the wrapped verification mode implementation.
      * Prepends the custom failure message if verification fails.
-     * @param data 
+     * @param data the data to be verified
      */
     @Override
     public void verify(VerificationData data) {

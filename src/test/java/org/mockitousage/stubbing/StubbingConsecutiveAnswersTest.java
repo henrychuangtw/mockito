@@ -11,10 +11,9 @@ import org.mockito.exceptions.base.MockitoException;
 import org.mockitousage.IMethods;
 import org.mockitoutil.TestBase;
 
-import static org.mockito.Mockito.stubVoid;
-import static org.mockito.Mockito.when;
+import static junit.framework.TestCase.*;
+import static org.mockito.Mockito.*;
 
-@SuppressWarnings("deprecation")
 public class StubbingConsecutiveAnswersTest extends TestBase {
 
     @Mock
@@ -36,7 +35,7 @@ public class StubbingConsecutiveAnswersTest extends TestBase {
 
     @Test
     public void should_return_consecutive_values_for_two_nulls() throws Exception {
-        when(mock.simpleMethod()).thenReturn(null, null);
+        when(mock.simpleMethod()).thenReturn(null, (String[]) null);
 
         assertNull(mock.simpleMethod());
         assertNull(mock.simpleMethod());
@@ -150,6 +149,7 @@ public class StubbingConsecutiveAnswersTest extends TestBase {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void should_throw_consecutively_classes_set_by_shorten_then_throw_method() throws Exception {
         // Unavoidable JDK7+ 'unchecked generic array creation' warning
         when(mock.simpleMethod()).thenThrow(RuntimeException.class,
@@ -210,11 +210,10 @@ public class StubbingConsecutiveAnswersTest extends TestBase {
 
     @Test
     public void should_stub_void_method_and_continue_throwing() throws Exception {
-        stubVoid(mock)
-                .toThrow(new IllegalArgumentException())
-                .toReturn()
-                .toThrow(new NullPointerException())
-                .on().voidMethod();
+        doThrow(new IllegalArgumentException())
+        .doNothing()
+        .doThrow(new NullPointerException())
+        .when(mock).voidMethod();
 
         try {
             mock.voidMethod();
@@ -236,10 +235,11 @@ public class StubbingConsecutiveAnswersTest extends TestBase {
 
     @Test
     public void should_stub_void_method() throws Exception {
-        stubVoid(mock).toReturn()
-                      .toThrow(new NullPointerException())
-                      .toReturn()
-                      .on().voidMethod();
+        doNothing()
+        .doThrow(new NullPointerException())
+        .doNothing()
+        .when(mock)
+        .voidMethod();
 
         mock.voidMethod();
 
@@ -254,8 +254,9 @@ public class StubbingConsecutiveAnswersTest extends TestBase {
 
     @Test(expected = MockitoException.class)
     public void should_validate_consecutive_exception_for_void_method() throws Exception {
-        stubVoid(mock).toReturn()
-                      .toThrow(new Exception())
-                      .on().voidMethod();
+        doNothing()
+        .doThrow(new Exception())
+        .when(mock)
+        .voidMethod();
     }
 }

@@ -4,17 +4,21 @@
  */
 package org.mockitousage.internal.debugging;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.Test;
 import org.mockito.internal.debugging.LocationImpl;
 import org.mockito.internal.exceptions.stacktrace.StackTraceFilter;
 import org.mockitoutil.TestBase;
+
+import static junit.framework.TestCase.assertEquals;
 
 @SuppressWarnings("serial")
 public class LocationImplTest extends TestBase {
 
     @Test
     public void shouldLocationNotContainGetStackTraceMethod() {
-        assertContains("shouldLocationNotContainGetStackTraceMethod", new LocationImpl().toString());
+        assertThat(new LocationImpl().toString()).contains("shouldLocationNotContainGetStackTraceMethod");
     }
 
     @Test

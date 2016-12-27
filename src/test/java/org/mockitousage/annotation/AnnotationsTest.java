@@ -5,15 +5,6 @@
 
 package org.mockitousage.annotation;
 
-import static org.mockito.Mockito.*;
-
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Answers;
@@ -23,19 +14,27 @@ import org.mockito.exceptions.base.MockitoException;
 import org.mockitousage.IMethods;
 import org.mockitoutil.TestBase;
 
-@SuppressWarnings("unchecked")
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import static junit.framework.TestCase.*;
+import static org.mockito.Mockito.verify;
+
 public class AnnotationsTest extends TestBase {
 
     @Retention(RetentionPolicy.RUNTIME)
     public @interface NotAMock {}
 
-    @Mock List list;
-    @Mock final Map map = new HashMap();
+    @Mock List<?> list;
+    @Mock final Map<Integer, String> map = new HashMap<Integer, String>();
         
-    @NotAMock Set notAMock;
+    @NotAMock Set<?> notAMock;
 
-    @SuppressWarnings("deprecation")
-    @MockitoAnnotations.Mock List listTwo;
+    @Mock List<?> listTwo;
 
     @Before
     public void setup() {

@@ -7,12 +7,15 @@ package org.mockito.internal.verification;
 
 import org.mockito.exceptions.base.MockitoException;
 import org.mockito.internal.invocation.InvocationMatcher;
+import org.mockito.invocation.MatchableInvocation;
 import org.mockito.internal.verification.api.VerificationData;
 import org.mockito.internal.verification.api.VerificationDataInOrder;
 import org.mockito.internal.verification.api.VerificationInOrderMode;
-import org.mockito.internal.verification.checkers.*;
 import org.mockito.invocation.Invocation;
 import org.mockito.verification.VerificationMode;
+
+import static org.mockito.internal.verification.checkers.NonGreedyNumberOfInvocationsInOrderChecker.check;
+import static org.mockito.internal.verification.checkers.MissingInvocationChecker.checkMissingInvocation;
 
 import java.util.List;
 
@@ -33,12 +36,10 @@ public class Calls implements VerificationMode, VerificationInOrderMode {
 
     public void verifyInOrder(VerificationDataInOrder data) {
         List<Invocation> allInvocations = data.getAllInvocations();
-        InvocationMatcher wanted = data.getWanted();
-        
-        MissingInvocationInOrderChecker missingInvocation = new MissingInvocationInOrderChecker();
-        missingInvocation.check( allInvocations, wanted, this, data.getOrderingContext());
-        NonGreedyNumberOfInvocationsInOrderChecker numberOfCalls = new NonGreedyNumberOfInvocationsInOrderChecker();
-        numberOfCalls.check( allInvocations, wanted, wantedCount, data.getOrderingContext());
+        MatchableInvocation wanted = data.getWanted();
+
+        checkMissingInvocation(allInvocations, wanted,  data.getOrderingContext());
+        check( allInvocations, wanted, wantedCount, data.getOrderingContext());
     }    
     
     @Override

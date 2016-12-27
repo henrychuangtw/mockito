@@ -5,17 +5,19 @@
 
 package org.mockitousage.verification;
 
-import static org.mockito.Mockito.*;
-
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.exceptions.base.MockitoException;
 import org.mockito.exceptions.verification.NoInteractionsWanted;
 import org.mockitoutil.TestBase;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import static junit.framework.TestCase.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.*;
 
 @SuppressWarnings("unchecked")
 public class NoMoreInteractionsVerificationTest extends TestBase {
@@ -89,7 +91,7 @@ public class NoMoreInteractionsVerificationTest extends TestBase {
             verifyNoMoreInteractions(mock);
             fail();
         } catch (NoInteractionsWanted e) {
-            assertContains("list of all invocations", e.getMessage());
+            assertThat(e).hasMessageContaining("list of all invocations");
         }
     }
     
@@ -101,14 +103,14 @@ public class NoMoreInteractionsVerificationTest extends TestBase {
             verifyNoMoreInteractions(mock);
             fail();
         } catch (NoInteractionsWanted e) {
-            assertNotContains("list of all invocations", e.getMessage());
+            assertThat(e.getMessage()).doesNotContain("list of all invocations");
         }
     }    
     
     @Test
     public void shouldVerifyOneMockButFailOnOther() throws Exception {
-        List list = mock(List.class);
-        Map map = mock(Map.class);
+        List<String> list = mock(List.class);
+        Map<String, Integer> map = mock(Map.class);
 
         list.add("one");
         list.add("one");

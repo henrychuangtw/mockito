@@ -1,16 +1,16 @@
 package org.mockitousage.constructor;
 
-import static org.mockito.Mockito.CALLS_REAL_METHODS;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.withSettings;
-import java.util.List;
 import org.junit.Test;
 import org.mockito.exceptions.base.MockitoException;
 import org.mockito.mock.SerializableMode;
 import org.mockitousage.IMethods;
 import org.mockitoutil.TestBase;
+
+import java.util.List;
+
+import static junit.framework.TestCase.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.*;
 
 public class CreatingMocksWithConstructorTest extends TestBase {
 
@@ -64,8 +64,8 @@ public class CreatingMocksWithConstructorTest extends TestBase {
             //then
             fail();
         } catch (MockitoException e) {
-            assertEquals("Unable to create mock instance of type 'HasConstructor'", e.getMessage());
-            assertContains("0-arg constructor", e.getCause().getMessage());
+            assertThat(e).hasMessage("Unable to create mock instance of type 'HasConstructor'");
+            assertThat(e.getCause()).hasMessageContaining("0-arg constructor");
         }
     }
 
@@ -77,8 +77,8 @@ public class CreatingMocksWithConstructorTest extends TestBase {
             //then
             fail();
         } catch (MockitoException e) {
-            assertEquals("Unable to create mock instance of type 'InnerClass'", e.getMessage());
-            assertContains("Please ensure that the outer instance has correct type and that the target class has 0-arg constructor.", e.getCause().getMessage());
+            assertThat(e).hasMessage("Unable to create mock instance of type 'InnerClass'");
+            assertThat(e.getCause()).hasMessageContaining("Please ensure that the outer instance has correct type and that the target class has 0-arg constructor.");
         }
     }
 

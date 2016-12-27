@@ -5,7 +5,8 @@
 package org.mockito.internal.matchers;
 
 import org.mockito.ArgumentMatcher;
-import org.mockito.exceptions.Reporter;
+
+import static org.mockito.internal.exceptions.Reporter.noArgumentValueWasCaptured;
 
 import java.io.Serializable;
 import java.util.LinkedList;
@@ -26,11 +27,11 @@ public class CapturingMatcher<T> implements ArgumentMatcher<T>, CapturesArgument
 
     public T getLastValue() {
         if (arguments.isEmpty()) {
-            new Reporter().noArgumentValueWasCaptured();
-            return null;
-        } else {
-            return (T) arguments.getLast();
+            throw noArgumentValueWasCaptured();
         }
+        
+        return (T) arguments.getLast();
+        
     }
 
     public List<T> getAllValues() {

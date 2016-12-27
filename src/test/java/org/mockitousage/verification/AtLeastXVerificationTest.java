@@ -6,18 +6,18 @@
 package org.mockitousage.verification;
 
 import org.junit.Test;
-import static org.mockito.Matchers.anyString;
 import org.mockito.Mock;
-import static org.mockito.Mockito.*;
 import org.mockito.exceptions.base.MockitoAssertionError;
 import org.mockitoutil.TestBase;
 
 import java.util.List;
 
-@SuppressWarnings("unchecked")
+import static junit.framework.TestCase.fail;
+import static org.mockito.Mockito.*;
+
 public class AtLeastXVerificationTest extends TestBase {
 
-    @Mock private List mock;
+    @Mock private List<String> mock;
 
     @Test
     public void shouldVerifyAtLeastXTimes() throws Exception {

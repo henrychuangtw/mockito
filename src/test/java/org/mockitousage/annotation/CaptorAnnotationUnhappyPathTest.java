@@ -5,8 +5,6 @@
 
 package org.mockitousage.annotation;
 
-import java.util.List;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Captor;
@@ -14,10 +12,14 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.exceptions.base.MockitoException;
 import org.mockitoutil.TestBase;
 
-@SuppressWarnings("unchecked")
+import java.util.List;
+
+import static junit.framework.TestCase.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+
 public class CaptorAnnotationUnhappyPathTest extends TestBase {
     
-    @Captor List notACaptorField;
+    @Captor List<?> notACaptorField;
 
     @Before
     @Override
@@ -33,8 +35,9 @@ public class CaptorAnnotationUnhappyPathTest extends TestBase {
             fail();
         } catch (MockitoException e) {
             //then
-            assertContains("notACaptorField", e.getMessage());
-            assertContains("wrong type", e.getMessage());
+            assertThat(e)
+                .hasMessageContaining("notACaptorField")
+                .hasMessageContaining("wrong type");
         }
     }
 }

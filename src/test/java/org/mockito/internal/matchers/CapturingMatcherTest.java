@@ -9,13 +9,15 @@ import org.junit.Test;
 import org.mockito.exceptions.base.MockitoException;
 import org.mockitoutil.TestBase;
 
-@SuppressWarnings("unchecked")
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.fail;
+
 public class CapturingMatcherTest extends TestBase {
 
     @Test
     public void should_capture_arguments() throws Exception {
         //given
-        CapturingMatcher m = new CapturingMatcher();
+        CapturingMatcher<String> m = new CapturingMatcher<String>();
         
         //when
         m.captureFrom("foo");
@@ -28,7 +30,7 @@ public class CapturingMatcherTest extends TestBase {
     @Test
     public void should_know_last_captured_value() throws Exception {
         //given
-        CapturingMatcher m = new CapturingMatcher();
+        CapturingMatcher<String> m = new CapturingMatcher<String>();
         
         //when
         m.captureFrom("foo");
@@ -41,7 +43,7 @@ public class CapturingMatcherTest extends TestBase {
     @Test
     public void should_scream_when_nothing_yet_captured() throws Exception {
         //given
-        CapturingMatcher m = new CapturingMatcher();
+        CapturingMatcher<String> m = new CapturingMatcher<String>();
 
         try {
             //when

@@ -5,18 +5,19 @@
 
 package org.mockitousage.stacktrace;
 
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.exceptions.verification.VerificationInOrderFailure;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.mockitousage.IMethods;
 import org.mockitoutil.TestBase;
+
+import static junit.framework.TestCase.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PointingStackTraceToActualInvocationChunkInOrderTest extends TestBase {
@@ -61,7 +62,7 @@ public class PointingStackTraceToActualInvocationChunkInOrderTest extends TestBa
             inOrder.verify(mock).simpleMethod(999);
             fail();
         } catch (VerificationInOrderFailure e) {
-            assertContains("secondChunk(", e.getMessage());
+            assertThat(e).hasMessageContaining("secondChunk(");
         }
     }
     
@@ -73,7 +74,7 @@ public class PointingStackTraceToActualInvocationChunkInOrderTest extends TestBa
             inOrder.verify(mockTwo).simpleMethod(999);
             fail();
         } catch (VerificationInOrderFailure e) {
-            assertContains("thirdChunk(", e.getMessage());
+            assertThat(e).hasMessageContaining("thirdChunk(");
         }
     }
     
@@ -87,7 +88,7 @@ public class PointingStackTraceToActualInvocationChunkInOrderTest extends TestBa
             inOrder.verify(mockTwo, times(3)).simpleMethod(999);
             fail();
         } catch (VerificationInOrderFailure e) {
-            assertContains("thirdChunk(", e.getMessage());
+            assertThat(e).hasMessageContaining("thirdChunk(");
         }
     }
     
@@ -99,7 +100,7 @@ public class PointingStackTraceToActualInvocationChunkInOrderTest extends TestBa
             inOrder.verify(mockTwo, times(0)).simpleMethod(anyInt());
             fail();
         } catch (VerificationInOrderFailure e) {
-            assertContains("fourthChunk(", e.getMessage());
+            assertThat(e).hasMessageContaining("fourthChunk(");
         }
     }
 }

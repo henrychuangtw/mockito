@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.mockito.internal.runners.RunnerImpl;
 import org.mockitoutil.TestBase;
 
+import static junit.framework.TestCase.assertNotNull;
 
 public class RunnerProviderTest extends TestBase {
     
@@ -16,7 +17,7 @@ public class RunnerProviderTest extends TestBase {
         //given
         RunnerProvider provider = new RunnerProvider();
         //when
-        RunnerImpl runner = provider.newInstance("org.mockito.internal.runners.JUnit45AndHigherRunnerImpl", this.getClass());
+        RunnerImpl runner = provider.newInstance("org.mockito.internal.runners.SilentJUnitRunner", this.getClass());
         //then
         assertNotNull(runner);
     }

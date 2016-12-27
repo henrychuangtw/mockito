@@ -5,10 +5,6 @@
 
 package org.mockitousage.misuse;
 
-import static org.mockito.Mockito.*;
-
-import java.util.List;
-
 import org.junit.After;
 import org.junit.Test;
 import org.mockito.InOrder;
@@ -16,10 +12,16 @@ import org.mockito.Mock;
 import org.mockito.exceptions.base.MockitoException;
 import org.mockitoutil.TestBase;
 
-@SuppressWarnings("unchecked")
+import java.util.List;
+
+import static junit.framework.TestCase.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.verify;
+
 public class RestrictedObjectMethodsTest extends TestBase {
 
-    @Mock List mock;
+    @Mock List<?> mock;
 
     @After
     public void after() {
@@ -32,7 +34,7 @@ public class RestrictedObjectMethodsTest extends TestBase {
             verify(mock).toString();
             fail();
         } catch (MockitoException e) {
-            assertContains("cannot verify", e.getMessage());
+            assertThat(e).hasMessageContaining("cannot verify");
         }
     }
 

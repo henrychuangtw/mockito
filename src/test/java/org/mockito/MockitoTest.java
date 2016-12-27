@@ -5,25 +5,24 @@
 
 package org.mockito;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.times;
+import static org.mockito.internal.progress.ThreadSafeMockingProgress.mockingProgress;
+
+import java.util.List;
 import org.junit.Test;
 import org.mockito.exceptions.misusing.NotAMockException;
 import org.mockito.internal.creation.MockSettingsImpl;
-import org.mockito.internal.progress.ThreadSafeMockingProgress;
-import org.mockitoutil.TestBase;
-
-import java.util.List;
-
-import static org.mockito.Mockito.times;
 
 @SuppressWarnings("unchecked")
-public class MockitoTest extends TestBase {
-
+public class MockitoTest {
+	
     @Test
     public void shouldRemoveStubbableFromProgressAfterStubbing() {
         List mock = Mockito.mock(List.class);
         Mockito.when(mock.add("test")).thenReturn(true);
         //TODO Consider to move to separate test
-        assertNull(new ThreadSafeMockingProgress().pullOngoingStubbing());
+        assertThat(mockingProgress().pullOngoingStubbing()).isNull();
     }
     
     @Test(expected=NotAMockException.class)
@@ -46,12 +45,6 @@ public class MockitoTest extends TestBase {
         Mockito.verifyZeroInteractions("notMock");
     }
     
-    @SuppressWarnings("deprecation")
-    @Test(expected=NotAMockException.class)
-    public void shouldValidateMockWhenStubbingVoid() {
-        Mockito.stubVoid("notMock");
-    }
-    
     @Test(expected=NotAMockException.class)
     public void shouldValidateMockWhenCreatingInOrderObject() {
         Mockito.inOrder("notMock");
@@ -60,11 +53,10 @@ public class MockitoTest extends TestBase {
     @Test
     public void shouldStartingMockSettingsContainDefaultBehavior() {
         //when
-        MockSettingsImpl settings = (MockSettingsImpl) Mockito.withSettings();
+        MockSettingsImpl<?> settings = (MockSettingsImpl<?>) Mockito.withSettings();
         
         //then
-        assertEquals(Mockito.RETURNS_DEFAULTS, settings.getDefaultAnswer());
+        assertThat(Mockito.RETURNS_DEFAULTS).isEqualTo(settings.getDefaultAnswer());
     }
     
-    //TODO: stack filter does not work very well when it comes to threads?
 }

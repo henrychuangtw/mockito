@@ -4,18 +4,20 @@
  */
 package org.mockito.internal.matchers;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.junit.Test;
 import org.mockito.internal.matchers.text.MatchersPrinter;
 import org.mockito.internal.reporting.PrintSettings;
 import org.mockitoutil.TestBase;
 
+import java.util.Arrays;
+import java.util.List;
+
+import static junit.framework.TestCase.assertEquals;
+
 @SuppressWarnings("unchecked")
 public class MatchersPrinterTest extends TestBase {
 
-    MatchersPrinter printer = new MatchersPrinter();
+    private final MatchersPrinter printer = new MatchersPrinter();
 
     @Test
     public void shouldGetArgumentsLine() {
@@ -34,7 +36,7 @@ public class MatchersPrinterTest extends TestBase {
         //when
         String line = printer.getArgumentsLine((List) Arrays.asList(new Equals(1L), new Equals(2)), PrintSettings.verboseMatchers(1));
         //then
-        assertEquals("(1, (Integer) 2);", line);
+        assertEquals("(1L, (Integer) 2);", line);
     }
 
     @Test
@@ -42,7 +44,7 @@ public class MatchersPrinterTest extends TestBase {
         //when
         String line = printer.getArgumentsLine((List) Arrays.asList(new Equals(1L), new Equals("x")), PrintSettings.verboseMatchers(1));
         //then
-        assertEquals("(1, (String) \"x\");", line);
+        assertEquals("(1L, (String) \"x\");", line);
     }
 
     @Test
@@ -50,7 +52,7 @@ public class MatchersPrinterTest extends TestBase {
         //when
         String line = printer.getArgumentsBlock((List) Arrays.asList(new Equals(1L), new Equals(2)), PrintSettings.verboseMatchers(0, 1));
         //then
-        assertEquals("(\n    (Long) 1,\n    (Integer) 2\n);", line);
+        assertEquals("(\n    (Long) 1L,\n    (Integer) 2\n);", line);
     }
 
     @Test
@@ -58,6 +60,6 @@ public class MatchersPrinterTest extends TestBase {
         //when
         String line = printer.getArgumentsLine((List) Arrays.asList(new Equals(1L), NotNull.NOT_NULL), PrintSettings.verboseMatchers(0));
         //then
-        assertEquals("((Long) 1, notNull());", line);
+        assertEquals("((Long) 1L, notNull());", line);
     }
 }

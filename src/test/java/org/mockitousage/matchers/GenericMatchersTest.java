@@ -5,15 +5,16 @@
 
 package org.mockitousage.matchers;
 
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import org.junit.Test;
+import org.mockito.ArgumentMatchers;
+import org.mockito.Mock;
+import org.mockitoutil.TestBase;
 
 import java.util.Date;
 import java.util.List;
 
-import org.junit.Test;
-import org.mockito.Mock;
-import org.mockitoutil.TestBase;
+import static org.mockito.Matchers.anyObject;
+import static org.mockito.Mockito.when;
 
 public class GenericMatchersTest extends TestBase {
     
@@ -31,6 +32,6 @@ public class GenericMatchersTest extends TestBase {
         when(sorter.convertDate((Date) anyObject())).thenReturn("two");
 
         //following requires warning suppression but allows setting anyList()
-        when(sorter.sort(anyList())).thenReturn(null);
+        when(sorter.sort(ArgumentMatchers.<String>anyList())).thenReturn(null);
     }
 }

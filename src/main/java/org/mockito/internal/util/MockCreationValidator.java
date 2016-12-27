@@ -4,23 +4,24 @@
  */
 package org.mockito.internal.util;
 
-import org.mockito.exceptions.Reporter;
-import org.mockito.internal.util.reflection.Constructors;
+import static org.mockito.internal.exceptions.Reporter.cannotMockClass;
+import static org.mockito.internal.exceptions.Reporter.extraInterfacesCannotContainMockedType;
+import static org.mockito.internal.exceptions.Reporter.mockedTypeIsInconsistentWithDelegatedInstanceType;
+import static org.mockito.internal.exceptions.Reporter.mockedTypeIsInconsistentWithSpiedInstanceType;
+import static org.mockito.internal.exceptions.Reporter.usingConstructorWithFancySerializable;
+
+import java.util.Collection;
+
 import org.mockito.mock.SerializableMode;
 import org.mockito.plugins.MockMaker.TypeMockability;
-
-import java.io.Serializable;
-import java.util.Collection;
 
 @SuppressWarnings("unchecked")
 public class MockCreationValidator {
 
-    private final MockUtil mockUtil = new MockUtil();
-
     public void validateType(Class<?> classToMock) {
-        TypeMockability typeMockability = mockUtil.typeMockabilityOf(classToMock);
+        TypeMockability typeMockability = MockUtil.typeMockabilityOf(classToMock);
         if (!typeMockability.mockable()) {
-            new Reporter().cannotMockClass(classToMock, typeMockability.nonMockableReason());
+            throw cannotMockClass(classToMock, typeMockability.nonMockableReason());
         }
     }
 
@@ -29,9 +30,9 @@ public class MockCreationValidator {
             return;
         }
 
-        for (Class i : extraInterfaces) {
+        for (Class<?> i : extraInterfaces) {
             if (classToMock == i) {
-                new Reporter().extraInterfacesCannotContainMockedType(classToMock);
+                throw extraInterfacesCannotContainMockedType(classToMock);
             }
         }
     }
@@ -41,7 +42,7 @@ public class MockCreationValidator {
             return;
         }
         if (!classToMock.equals(spiedInstance.getClass())) {
-            new Reporter().mockedTypeIsInconsistentWithSpiedInstanceType(classToMock, spiedInstance);
+            throw mockedTypeIsInconsistentWithSpiedInstanceType(classToMock, spiedInstance);
         }
     }
 
@@ -50,13 +51,13 @@ public class MockCreationValidator {
             return;
         }
         if (delegatedInstance.getClass().isAssignableFrom(classToMock)) {
-            new Reporter().mockedTypeIsInconsistentWithDelegatedInstanceType(classToMock, delegatedInstance);
+            throw mockedTypeIsInconsistentWithDelegatedInstanceType(classToMock, delegatedInstance);
         }
     }
 
     public void validateConstructorUse(boolean usingConstructor, SerializableMode mode) {
         if (usingConstructor && mode == SerializableMode.ACROSS_CLASSLOADERS) {
-            new Reporter().usingConstructorWithFancySerializable(mode);
+            throw usingConstructorWithFancySerializable(mode);
         }
     }
 }

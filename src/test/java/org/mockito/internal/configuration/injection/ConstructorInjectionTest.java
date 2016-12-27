@@ -8,10 +8,8 @@ package org.mockito.internal.configuration.injection;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Matchers;
 import org.mockito.Mock;
-import org.mockito.internal.util.reflection.FieldInitializer.ConstructorArgumentResolver;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.lang.reflect.Field;
 import java.util.HashSet;
@@ -20,7 +18,6 @@ import java.util.Set;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.BDDMockito.given;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ConstructorInjectionTest {
@@ -28,18 +25,15 @@ public class ConstructorInjectionTest {
     @Mock private Observer observer;
     private ArgConstructor whatever;
 
-    @Mock private ConstructorArgumentResolver resolver;
     private ConstructorInjection underTest;
 
     @Before
     public void initialize_dependencies() {
-        underTest = new ConstructorInjection(resolver);
+        underTest = new ConstructorInjection();
     }
 
     @Test
     public void should_do_the_trick_of_instantiating() throws Exception {
-        given(resolver.resolveTypeInstances(Matchers.<Class<?>[]>anyVararg())).willReturn(new Object[] { observer });
-
         boolean result = underTest.process(field("whatever"), this, newSetOf(observer));
 
         assertTrue(result);

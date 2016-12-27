@@ -6,6 +6,9 @@ import org.mockitoutil.TestBase;
 
 import java.lang.reflect.Method;
 
+import static junit.framework.TestCase.assertFalse;
+import static junit.framework.TestCase.assertTrue;
+
 public class DelegatingMethodTest extends TestBase {
 
     private Method someMethod, otherMethod;
@@ -47,8 +50,8 @@ public class DelegatingMethodTest extends TestBase {
 
     private interface Something {
 
-        public Object someMethod(Object param);
+        Object someMethod(Object param);
 
-        public Object otherMethod(Object param);
+        Object otherMethod(Object param);
     }
 }

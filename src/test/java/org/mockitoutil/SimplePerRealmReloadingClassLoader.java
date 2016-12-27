@@ -14,7 +14,7 @@ import java.util.concurrent.Callable;
  */
 public class SimplePerRealmReloadingClassLoader extends URLClassLoader {
 
-    private final Map<String,Class> classHashMap = new HashMap<String, Class>();
+    private final Map<String,Class<?>> classHashMap = new HashMap<String, Class<?>>();
     private ReloadClassPredicate reloadClassPredicate;
 
     public SimplePerRealmReloadingClassLoader(ReloadClassPredicate reloadClassPredicate) {
@@ -95,7 +95,7 @@ public class SimplePerRealmReloadingClassLoader extends URLClassLoader {
     }
 
 
-    public Object doInRealm(String callableCalledInClassLoaderRealm, Class[] argTypes, Object[] args) throws Exception {
+    public Object doInRealm(String callableCalledInClassLoaderRealm, Class<?>[] argTypes, Object[] args) throws Exception {
         ClassLoader current = Thread.currentThread().getContextClassLoader();
         try {
             Thread.currentThread().setContextClassLoader(this);

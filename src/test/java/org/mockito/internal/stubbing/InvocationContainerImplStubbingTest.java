@@ -5,6 +5,8 @@
 
 package org.mockito.internal.stubbing;
 
+import static org.mockito.internal.progress.ThreadSafeMockingProgress.mockingProgress;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.exceptions.base.MockitoException;
@@ -12,11 +14,13 @@ import org.mockito.internal.creation.MockSettingsImpl;
 import org.mockito.internal.invocation.InvocationBuilder;
 import org.mockito.internal.invocation.InvocationMatcher;
 import org.mockito.internal.progress.MockingProgress;
-import org.mockito.internal.progress.MockingProgressImpl;
 import org.mockito.internal.stubbing.answers.Returns;
 import org.mockito.internal.stubbing.answers.ThrowsException;
 import org.mockito.invocation.Invocation;
 import org.mockitoutil.TestBase;
+
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.fail;
 
 public class InvocationContainerImplStubbingTest extends TestBase {
 
@@ -27,13 +31,13 @@ public class InvocationContainerImplStubbingTest extends TestBase {
 
     @Before
     public void setup() {
-        state = new MockingProgressImpl();
+        state = mockingProgress();
 
-        invocationContainerImpl = new InvocationContainerImpl(state, new MockSettingsImpl());
+        invocationContainerImpl = new InvocationContainerImpl(new MockSettingsImpl());
         invocationContainerImpl.setInvocationForPotentialStubbing(new InvocationBuilder().toInvocationMatcher());
 
         invocationContainerImplStubOnly =
-          new InvocationContainerImpl(state, new MockSettingsImpl().stubOnly());
+          new InvocationContainerImpl( new MockSettingsImpl().stubOnly());
         invocationContainerImplStubOnly.setInvocationForPotentialStubbing(new InvocationBuilder().toInvocationMatcher());
 
         simpleMethod = new InvocationBuilder().simpleMethod().toInvocation();
@@ -121,5 +125,5 @@ public class InvocationContainerImplStubbingTest extends TestBase {
     }
 
     @SuppressWarnings("serial")
-    class MyException extends RuntimeException {};
+    class MyException extends RuntimeException {}
 }

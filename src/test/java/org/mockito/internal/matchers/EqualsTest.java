@@ -8,6 +8,8 @@ package org.mockito.internal.matchers;
 import org.junit.Test;
 import org.mockitoutil.TestBase;
 
+import static junit.framework.TestCase.*;
+
 
 public class EqualsTest extends TestBase {
 
@@ -37,7 +39,7 @@ public class EqualsTest extends TestBase {
     public void shouldDescribeWithExtraTypeInfoOfLong() throws Exception {
         String descStr = new Equals(100L).toStringWithType();
         
-        assertEquals("(Long) 100", descStr);
+        assertEquals("(Long) 100L", descStr);
     }
 
     @Test

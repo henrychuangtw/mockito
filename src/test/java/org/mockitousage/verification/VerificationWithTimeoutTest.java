@@ -5,202 +5,169 @@
 
 package org.mockitousage.verification;
 
-import static org.mockito.Matchers.anyString;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.mockito.InOrder;
+import org.mockito.Mock;
+import org.mockito.exceptions.base.MockitoAssertionError;
+import org.mockito.exceptions.verification.NoInteractionsWanted;
+import org.mockito.exceptions.verification.TooLittleActualInvocations;
+import org.mockito.junit.MockitoRule;
+import org.mockitousage.IMethods;
+import org.mockitoutil.RetryRule;
+
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.junit.rules.ExpectedException.none;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import java.util.LinkedList;
-import java.util.List;
-import org.junit.After;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.mockito.InOrder;
-import org.mockito.Mock;
-import org.mockito.exceptions.base.MockitoAssertionError;
-import org.mockito.exceptions.verification.NoInteractionsWanted;
-import org.mockito.exceptions.verification.TooLittleActualInvocations;
-import org.mockitoutil.TestBase;
+import static org.mockito.junit.MockitoJUnit.rule;
 
-public class VerificationWithTimeoutTest extends TestBase {
+public class VerificationWithTimeoutTest {
 
-    List<Exception> exceptions = new LinkedList<Exception>();
+    @Rule
+    public MockitoRule mockito = rule();
 
-    @After
-    public void after() {
-        //making sure there are no threading related exceptions
-        assertTrue(exceptions.isEmpty());
-        exceptions.clear();
-    }
+    @Rule
+    public RetryRule retryRule = RetryRule.attempts(4);
+
+    @Rule
+    public ExpectedException exception = none();
 
     @Mock
-    private List<String> mock;
+    private IMethods mock;
+
+    private DelayedExecution delayedExecution;
+
+    @Before
+    public void setUp() {
+        delayedExecution = new DelayedExecution();
+    }
+
+    @After
+    public void tearDown() throws InterruptedException {
+        delayedExecution.close();
+    }
 
     @Test
     public void shouldVerifyWithTimeout() throws Exception {
-        //given
-        Thread t = waitAndExerciseMock(20);
+        // when
+        delayedExecution.callAsync(30, MILLISECONDS, callMock('c'));
 
-        //when
-        t.start();
-
-        //then
-        verify(mock, timeout(100)).clear();
-
-        verify(mock, timeout(100).atLeastOnce()).clear();
-        verify(mock, timeout(100).times(1)).clear();
-
-
-        verify(mock).clear();
-        verify(mock, times(1)).clear();
+        // then
+        verify(mock, timeout(100)).oneArg('c');
+        verify(mock, timeout(100).atLeastOnce()).oneArg('c');
+        verify(mock, timeout(100).times(1)).oneArg('c');
+        verify(mock).oneArg('c');
+        verify(mock, times(1)).oneArg('c');
     }
 
     @Test
     public void shouldFailVerificationWithTimeout() throws Exception {
-        //given
-        Thread t = waitAndExerciseMock(80);
+        // when
+        delayedExecution.callAsync(30, MILLISECONDS, callMock('c'));
 
-        //when
-        t.start();
-
-        //then
-        verify(mock, never()).clear();
-        try {
-            verify(mock, timeout(20).atLeastOnce()).clear();
-            fail();
-        } catch (MockitoAssertionError e) {
-        }
+        // then
+        verify(mock, never()).oneArg('c');
+        exception.expect(MockitoAssertionError.class);
+        verify(mock, timeout(20).atLeastOnce()).oneArg('c');
     }
 
     @Test
     public void shouldAllowMixingOtherModesWithTimeout() throws Exception {
-        //given
-        Thread t1 = waitAndExerciseMock(30);
-        Thread t2 = waitAndExerciseMock(30);
+        // when
+        delayedExecution.callAsync(10, MILLISECONDS, callMock('c'));
+        delayedExecution.callAsync(10, MILLISECONDS, callMock('c'));
 
-        //when
-        t1.start();
-        t2.start();
-
-        //then
-        verify(mock, timeout(50).atLeast(1)).clear();
-        verify(mock, timeout(50).times(2)).clear();
+        // then
+        verify(mock, timeout(100).atLeast(1)).oneArg('c');
+        verify(mock, timeout(100).times(2)).oneArg('c');
         verifyNoMoreInteractions(mock);
     }
 
     @Test
     public void shouldAllowMixingOtherModesWithTimeoutAndFail() throws Exception {
-        //given
-        Thread t1 = waitAndExerciseMock(30);
-        Thread t2 = waitAndExerciseMock(30);
+        // when
+        delayedExecution.callAsync(10, MILLISECONDS, callMock('c'));
+        delayedExecution.callAsync(10, MILLISECONDS, callMock('c'));
 
-        //when
-        t1.start();
-        t2.start();
-
-        //then
-        verify(mock, timeout(50).atLeast(1)).clear();
-        try {
-            verify(mock, timeout(100).times(3)).clear();
-            fail();
-        } catch (TooLittleActualInvocations e) {}
+        // then
+        verify(mock, timeout(100).atLeast(1)).oneArg('c');
+        exception.expect(TooLittleActualInvocations.class);
+        verify(mock, timeout(100).times(3)).oneArg('c');
     }
 
     @Test
     public void shouldAllowMixingOnlyWithTimeout() throws Exception {
-        //given
-        Thread t1 = waitAndExerciseMock(20);
+        // when
+        delayedExecution.callAsync(30, MILLISECONDS, callMock('c'));
 
-        //when
-        t1.start();
-
-        //then
-        verify(mock, never()).clear();
-        verify(mock, timeout(40).only()).clear();
+        // then
+        verify(mock, never()).oneArg('c');
+        verify(mock, timeout(100).only()).oneArg('c');
     }
 
     @Test
     public void shouldAllowMixingOnlyWithTimeoutAndFail() throws Exception {
-        //given
-        Thread t1 = waitAndExerciseMock(20);
+        // when
+        delayedExecution.callAsync(30, MILLISECONDS, callMock('c'));
 
-        //when
-        t1.start();
-        mock.add("foo");
+        // and when
+        mock.oneArg('x');
 
-        //then
-        verify(mock, never()).clear();
-        try {
-            verify(mock, timeout(40).only()).clear();
-            fail();
-        } catch (NoInteractionsWanted e) {}
+        // then
+        verify(mock, never()).oneArg('c');
+        exception.expect(NoInteractionsWanted.class);
+        verify(mock, timeout(100).only()).oneArg('c');
     }
 
     /**
-     * This test is JUnit-specific because the code behaves different if JUnit is used.
+     * This test is JUnit-specific because the code behaves different if JUnit
+     * is used.
      */
     @Test
-    public void canIgnoreInvocationsWithJunit() {
-        //given
-        Thread t1 = new Thread() {
-            @Override
-            public void run() {
-                mock.add("0");
-                mock.add("1");
-                VerificationWithTimeoutTest.this.sleep(100);
-                mock.add("2");
-            }
-        };
+    public void canIgnoreInvocationsWithJunit() throws InterruptedException {
+        // when
+        delayedExecution.callAsync(10, MILLISECONDS, callMock('1'));
 
-        //when
-        t1.start();
+        // then
+        verify(mock, timeout(50)).oneArg('1');
 
-        //then
-        verify(mock, timeout(200)).add("1");
-        verify(mock, timeout(200)).add("2");
+        // when
+        delayedExecution.callAsync(10, MILLISECONDS, callMock('2'));
+        delayedExecution.callAsync(20, MILLISECONDS, callMock('3'));
+
+        // then
+        verify(mock, timeout(50)).oneArg('3');
     }
 
-    private void sleep(long milliseconds) {
-        try {
-            Thread.sleep(milliseconds);
-        } catch (InterruptedException ignored) {
-            // we do not need to handle this.
-        }
-    }
-
-    //TODO not yet implemented
-    @Ignore("TODO not yet implemented")
     @Test
     public void shouldAllowTimeoutVerificationInOrder() throws Exception {
-        //given
-        Thread t1 = waitAndExerciseMock(20);
+        // when
+        delayedExecution.callAsync(50, MILLISECONDS, callMock('1'));
 
-        //when
-        t1.start();
-        mock.add("foo");
+        // and when
+        mock.oneArg('x');
 
-        //then
+        // then
         InOrder inOrder = inOrder(mock);
-        inOrder.verify(mock).add(anyString());
-        inOrder.verify(mock, never()).clear();
-        inOrder.verify(mock, timeout(40)).clear();
+        inOrder.verify(mock).oneArg('x');
+        inOrder.verify(mock, never()).oneArg('1');
+        inOrder.verify(mock, timeout(100)).oneArg('1');
     }
 
-    private Thread waitAndExerciseMock(final int sleep) {
-        Thread t = new Thread() {
+    private Runnable callMock(final char c) {
+        return new Runnable() {
             @Override
             public void run() {
-                try {
-                    Thread.sleep(sleep);
-                } catch (InterruptedException e) {
-                    exceptions.add(e);
-                    throw new RuntimeException(e);
-                }
-                mock.clear();
+                mock.oneArg(c);
             }
         };
-        return t;
     }
 }

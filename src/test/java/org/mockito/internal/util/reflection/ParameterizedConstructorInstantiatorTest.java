@@ -14,7 +14,7 @@ import org.mockito.Mock;
 import org.mockito.exceptions.base.MockitoException;
 import org.mockito.internal.util.reflection.FieldInitializer.ConstructorArgumentResolver;
 import org.mockito.internal.util.reflection.FieldInitializer.ParameterizedConstructorInstantiator;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -33,7 +33,7 @@ import static org.mockito.Mockito.mock;
 @RunWith(MockitoJUnitRunner.class)
 public class ParameterizedConstructorInstantiatorTest {
 
-    private Set whateverForNow;
+    private Set<?> whateverForNow;
     private OneConstructor withOneConstructor;
     private MultipleConstructor withMultipleConstructor;
     private NoArgConstructor withNoArgConstructor;
@@ -82,7 +82,7 @@ public class ParameterizedConstructorInstantiatorTest {
     @Test
     public void should_fail_if_an_argument_instance_type_do_not_match_wanted_type() throws Exception {
         Observer observer = mock(Observer.class);
-        Set wrongArg = mock(Set.class);
+        Set<?> wrongArg = mock(Set.class);
         given(resolver.resolveTypeInstances(Matchers.<Class<?>[]>anyVararg())).willReturn(new Object[]{ observer, wrongArg });
 
         try {

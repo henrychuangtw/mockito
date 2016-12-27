@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2016 Mockito contributors
+ * This program is made available under the terms of the MIT License.
+ */
 package org.mockito.internal.configuration.plugins;
 
 import org.mockito.plugins.InstantiatorProvider;
@@ -9,7 +13,7 @@ import org.mockito.plugins.StackTraceCleanerProvider;
  */
 public class Plugins {
 
-    private static PluginRegistry registry = new PluginRegistry();
+    private static final PluginRegistry registry = new PluginRegistry();
 
     /**
      * The implementation of the stack trace cleaner

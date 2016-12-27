@@ -5,8 +5,6 @@
 
 package org.mockitousage.stubbing;
 
-import static org.mockito.Mockito.*;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -14,6 +12,11 @@ import org.mockito.exceptions.verification.SmartNullPointerException;
 import org.mockito.exceptions.verification.WantedButNotInvoked;
 import org.mockitousage.IMethods;
 import org.mockitoutil.TestBase;
+
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.*;
 
 public class SmartNullsStubbingTest extends TestBase {
 
@@ -35,7 +38,7 @@ public class SmartNullsStubbingTest extends TestBase {
             methods.simpleMethod();
             fail();
         } catch (SmartNullPointerException e) {
-            assertContains("unstubbedMethodInvokedHere(", e.getMessage());
+            assertThat(e).hasMessageContaining("unstubbedMethodInvokedHere(");
         }
     }
 
@@ -114,7 +117,7 @@ public class SmartNullsStubbingTest extends TestBase {
             smartNull.boo();
             fail();
         } catch (Exception e) {
-            assertContains("yes sir", e.getMessage());
+            assertThat(e).hasMessageContaining("yes sir");
         }
     }
 
@@ -128,7 +131,7 @@ public class SmartNullsStubbingTest extends TestBase {
             smartNull.boo();
             fail();
         } catch (Exception e) {
-            assertContains("Lorem Ipsum", e.getMessage());
+            assertThat(e).hasMessageContaining("Lorem Ipsum");
         }
     }
 }

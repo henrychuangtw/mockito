@@ -4,22 +4,17 @@
  */
 package org.mockito.internal.util.reflection;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
-import static org.mockito.internal.util.reflection.GenericMetadataSupport.inferFrom;
+import org.junit.Test;
 
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-import org.junit.Test;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.fail;
+import static org.mockito.internal.util.reflection.GenericMetadataSupport.inferFrom;
 
 public class GenericMetadataSupportTest {
   
@@ -33,6 +28,11 @@ public class GenericMetadataSupportTest {
         E get();
     }
     interface ListOfNumbers extends List<Number> {}
+    interface AnotherListOfNumbers extends ListOfNumbers {}
+
+    abstract class ListOfNumbersImpl implements ListOfNumbers {}
+    abstract class AnotherListOfNumbersImpl extends ListOfNumbersImpl {}
+
     interface ListOfAnyNumbers<N extends Number & Cloneable> extends List<N> {}
 
     interface GenericsNest<K extends Comparable<K> & Cloneable> extends Map<K, Set<Number>> {
@@ -73,19 +73,48 @@ public class GenericMetadataSupportTest {
 
     @Test
     public void can_get_type_variables_from_Class() throws Exception {
-        assertThat(inferFrom(GenericsNest.class).actualTypeArguments().keySet()).hasSize(1).extracting("name").contains("K");
+        Set<TypeVariable<?>> genericsNestKeySet = inferFrom(GenericsNest.class).actualTypeArguments().keySet();
+        assertThat(genericsNestKeySet.size()).isEqualTo(1);
+        assertThat(genericsNestKeySet.iterator().next().getName()).isEqualTo("K");
         assertThat(inferFrom(ListOfNumbers.class).actualTypeArguments().keySet()).isEmpty();
-        assertThat(inferFrom(ListOfAnyNumbers.class).actualTypeArguments().keySet()).hasSize(1).extracting("name").contains("N");
-        assertThat(inferFrom(Map.class).actualTypeArguments().keySet()).hasSize(2).extracting("name").contains("K", "V");
+
+        Set<TypeVariable<?>> listOfAnyNumbersKeySet = inferFrom(ListOfAnyNumbers.class).actualTypeArguments().keySet();
+        assertThat(listOfAnyNumbersKeySet.size()).isEqualTo(1);
+        assertThat(listOfAnyNumbersKeySet.iterator().next().getName()).isEqualTo("N");
+
+        Set<TypeVariable<?>> mapKeySet = inferFrom(Map.class).actualTypeArguments().keySet();
+        assertThat(mapKeySet.size()).isEqualTo(2);
+        Iterator<TypeVariable<?>> iterator = mapKeySet.iterator();
+        assertThat(iterator.next().getName()).isEqualTo("K");
+        assertThat(iterator.next().getName()).isEqualTo("V");
+
         assertThat(inferFrom(Serializable.class).actualTypeArguments().keySet()).isEmpty();
         assertThat(inferFrom(StringList.class).actualTypeArguments().keySet()).isEmpty();
     }
 
     @Test
+    public void can_resolve_type_variables_from_ancestors() throws Exception {
+        Method listGet = List.class.getMethod("get", int.class);
+        assertThat(inferFrom(AnotherListOfNumbers.class).resolveGenericReturnType(listGet).rawType()).isEqualTo(Number.class);
+        assertThat(inferFrom(AnotherListOfNumbersImpl.class).resolveGenericReturnType(listGet).rawType()).isEqualTo(Number.class);
+    }
+
+    @Test
     public void can_get_type_variables_from_ParameterizedType() throws Exception {
-        assertThat(inferFrom(GenericsNest.class.getGenericInterfaces()[0]).actualTypeArguments().keySet()).hasSize(2).extracting("name").contains("K", "V");
-        assertThat(inferFrom(ListOfAnyNumbers.class.getGenericInterfaces()[0]).actualTypeArguments().keySet()).hasSize(1).extracting("name").contains("E");
-        assertThat(inferFrom(Integer.class.getGenericInterfaces()[0]).actualTypeArguments().keySet()).hasSize(1).extracting("name").contains("T");
+        Set<TypeVariable<?>> genericsNestKeySet = inferFrom(GenericsNest.class.getGenericInterfaces()[0]).actualTypeArguments().keySet();
+        assertThat(genericsNestKeySet .size()).isEqualTo(2);
+        Iterator<TypeVariable<?>> genericsNestKeySetIterator = genericsNestKeySet .iterator();
+        assertThat(genericsNestKeySetIterator.next().getName()).isEqualTo("K");
+        assertThat(genericsNestKeySetIterator.next().getName()).isEqualTo("V");
+
+        Set<TypeVariable<?>> listOfAnyNumbersKeySet = inferFrom(ListOfAnyNumbers.class.getGenericInterfaces()[0]).actualTypeArguments().keySet();
+        assertThat(listOfAnyNumbersKeySet.size()).isEqualTo(1);
+        assertThat(listOfAnyNumbersKeySet.iterator().next().getName()).isEqualTo("E");
+
+        Set<TypeVariable<?>> integerKeySet = inferFrom(Integer.class.getGenericInterfaces()[0]).actualTypeArguments().keySet();
+        assertThat(integerKeySet.size()).isEqualTo(1);
+        assertThat(integerKeySet.iterator().next().getName()).isEqualTo("T");
+
         assertThat(inferFrom(StringBuilder.class.getGenericInterfaces()[0]).actualTypeArguments().keySet()).isEmpty();
         assertThat(inferFrom(StringList.class).actualTypeArguments().keySet()).isEmpty();
     }
@@ -192,10 +221,8 @@ public class GenericMetadataSupportTest {
         assertThat(boundedType.interfaceBounds()).contains(Cloneable.class);
     }
 
-
-
-    private Type typeVariableValue(Map<TypeVariable, Type> typeVariables, String typeVariableName) {
-        for (Map.Entry<TypeVariable, Type> typeVariableTypeEntry : typeVariables.entrySet()) {
+    private Type typeVariableValue(Map<TypeVariable<?>, Type> typeVariables, String typeVariableName) {
+        for (Map.Entry<TypeVariable<?>, Type> typeVariableTypeEntry : typeVariables.entrySet()) {
             if (typeVariableTypeEntry.getKey().getName().equals(typeVariableName)) {
                 return typeVariableTypeEntry.getValue();
             }

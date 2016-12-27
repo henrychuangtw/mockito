@@ -3,9 +3,6 @@ apply plugin: 'com.jfrog.bintray'
 //if the build fails, we don't want to publish
 tasks.bintrayUpload.mustRunAfter "build"
 
-//if upload fails, don't increment version
-tasks.incrementVersion.mustRunAfter tasks.bintrayUpload
-
 def theVcsTag = "v" + project.version
 
 bintray {
@@ -14,12 +11,15 @@ bintray {
 
     publications = ['mockitoCore']
 
-    dryRun = project.hasProperty('dryRun')
     publish = true
 
     pkg {
         repo = 'maven'
-        //userOrg = 'org.mockito' // an optional organization name when the repo belongs to one of the user's orgs
+
+        userOrg = 'mockito'
+        // so that despite using 'szczepiq' user, the artifact is published
+        // to 'mockito' organization and all members can modify/edit it
+
         name = 'mockito'
         desc = 'Mockito library'
         websiteUrl = 'http://mockito.org'
@@ -37,9 +37,10 @@ bintray {
                sign = true
             }
 
+            //Automatically syncs to central repository (https://oss.sonatype.org/)
             mavenCentralSync {
-                user = 'mockito'
-                password = System.env.NEXUS_PWD
+                user = System.env.NEXUS_TOKEN_USER
+                password = System.env.NEXUS_TOKEN_PWD
             }
         }
     }

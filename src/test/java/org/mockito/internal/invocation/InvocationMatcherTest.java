@@ -5,23 +5,29 @@
 
 package org.mockito.internal.invocation;
 
-import org.assertj.core.api.Assertions;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.ArgumentMatcher;
-import org.mockito.Mock;
-import org.mockito.internal.matchers.*;
-import org.mockito.invocation.Invocation;
-import org.mockitousage.IMethods;
-import org.mockitoutil.TestBase;
+import static java.util.Arrays.asList;
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertFalse;
+import static junit.framework.TestCase.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.internal.matchers.Any.ANY;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static java.util.Arrays.asList;
+import org.assertj.core.api.Assertions;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.ArgumentMatcher;
+import org.mockito.Mock;
+import org.mockito.internal.matchers.CapturingMatcher;
+import org.mockito.internal.matchers.Equals;
+import org.mockito.internal.matchers.NotNull;
+import org.mockito.invocation.Invocation;
+import org.mockitousage.IMethods;
+import org.mockitoutil.TestBase;
 
 @SuppressWarnings("unchecked")
 public class InvocationMatcherTest extends TestBase {
@@ -39,7 +45,7 @@ public class InvocationMatcherTest extends TestBase {
         Invocation invocation = new InvocationBuilder().toInvocation();
         Invocation invocationTwo = new InvocationBuilder().args("blah").toInvocation();
 
-        Map map = new HashMap();
+        Map<InvocationMatcher, String> map = new HashMap<InvocationMatcher, String>();
         map.put(new InvocationMatcher(invocation), "one");
         map.put(new InvocationMatcher(invocationTwo), "two");
 
@@ -62,8 +68,8 @@ public class InvocationMatcherTest extends TestBase {
         ArgumentMatcher mTwo = new Equals('x');
         InvocationMatcher equals = new InvocationMatcher(new InvocationBuilder().toInvocation(), asList(mTwo));
 
-        assertContains("simpleMethod(notNull())", notNull.toString());
-        assertContains("simpleMethod('x')", equals.toString());
+        assertThat(notNull.toString()).contains("simpleMethod(notNull())");
+        assertThat(equals.toString()).contains("simpleMethod('x')");
     }
 
     @Test
@@ -131,7 +137,7 @@ public class InvocationMatcherTest extends TestBase {
         //given
         mock.varargs("1", "2");
         Invocation invocation = getLastInvocation();
-        InvocationMatcher invocationMatcher = new InvocationMatcher(invocation, (List) asList(AnyVararg.ANY_VARARG));
+        InvocationMatcher invocationMatcher = new InvocationMatcher(invocation, (List) asList(ANY));
 
         //when
         boolean match = invocationMatcher.matches(invocation);
@@ -162,7 +168,7 @@ public class InvocationMatcherTest extends TestBase {
         Invocation invocation = getLastInvocation();
 
         //when
-        InvocationMatcher invocationMatcher = new InvocationMatcher(invocation, asList(AnyVararg.ANY_VARARG));
+        InvocationMatcher invocationMatcher = new InvocationMatcher(invocation,(List) asList(ANY));
 
         //then
         invocationMatcher.captureArgumentsFrom(invocation);

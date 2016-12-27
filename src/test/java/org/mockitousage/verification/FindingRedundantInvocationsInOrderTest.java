@@ -5,8 +5,6 @@
 
 package org.mockitousage.verification;
 
-import static org.mockito.Mockito.*;
-
 import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mock;
@@ -14,6 +12,11 @@ import org.mockito.exceptions.misusing.UnfinishedVerificationException;
 import org.mockito.exceptions.verification.VerificationInOrderFailure;
 import org.mockitousage.IMethods;
 import org.mockitoutil.TestBase;
+
+import static junit.framework.TestCase.fail;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.verify;
 
 public class FindingRedundantInvocationsInOrderTest extends TestBase {
 
@@ -40,7 +43,7 @@ public class FindingRedundantInvocationsInOrderTest extends TestBase {
             inOrder.verifyNoMoreInteractions();
             fail();
         } catch(VerificationInOrderFailure e) {
-            assertContains("No interactions wanted", e.getMessage());
+            assertThat(e).hasMessageContaining("No interactions wanted");
         }
     }
     

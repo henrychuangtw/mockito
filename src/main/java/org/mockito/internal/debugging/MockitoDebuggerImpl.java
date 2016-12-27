@@ -15,12 +15,15 @@ import static java.util.Arrays.asList;
 
 public class MockitoDebuggerImpl implements MockitoDebugger {
 
-    private final AllInvocationsFinder allInvocationsFinder = new AllInvocationsFinder();
     private final UnusedStubsFinder unusedStubsFinder = new UnusedStubsFinder();
 
+    /**
+     * TODO: when MockitoDebugger is deleted, delete this implementation, too
+     */
+    @Deprecated
     public String printInvocations(Object ... mocks) {
         String out = "";
-        List<Invocation> invocations = allInvocationsFinder.find(asList(mocks));
+        List<Invocation> invocations = AllInvocationsFinder.find(asList(mocks));
         out += line("********************************");
         out += line("*** Mockito interactions log ***");
         out += line("********************************");

@@ -5,11 +5,13 @@
 
 package org.mockito.internal.exceptions.stacktrace;
 
+import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.mockito.exceptions.base.TraceBuilder;
 import org.mockitoutil.TestBase;
 
-import static org.mockitoutil.ExtraMatchers.hasOnlyThoseClasses;
+import static junit.framework.TestCase.assertEquals;
+import static org.mockitoutil.Conditions.onlyThoseClasses;
 
 public class StackTraceFilterTest extends TestBase {
     
@@ -24,7 +26,7 @@ public class StackTraceFilterTest extends TestBase {
         
         StackTraceElement[] filtered = filter.filter(t, false);
         
-        assertThat(filtered, hasOnlyThoseClasses("MockitoExampleTest"));
+        Assertions.assertThat(filtered).has(onlyThoseClasses("MockitoExampleTest"));
     }
 
     @Test
@@ -36,7 +38,7 @@ public class StackTraceFilterTest extends TestBase {
 
         StackTraceElement[] filtered = filter.filter(t, false);
 
-        assertThat(filtered, hasOnlyThoseClasses("MockitoExampleTest"));
+        Assertions.assertThat(filtered).has(onlyThoseClasses("MockitoExampleTest"));
     }
 
 
@@ -48,8 +50,8 @@ public class StackTraceFilterTest extends TestBase {
         ).toTraceArray();
             
         StackTraceElement[] filtered = filter.filter(t, false);
-        
-        assertThat(filtered, hasOnlyThoseClasses("org.test.MockitoSampleTest"));
+
+        Assertions.assertThat(filtered).has(onlyThoseClasses("org.test.MockitoSampleTest"));
     }
     
     @Test
@@ -63,8 +65,8 @@ public class StackTraceFilterTest extends TestBase {
         ).toTraceArray();
         
         StackTraceElement[] filtered = filter.filter(t, false);
-        
-        assertThat(filtered, hasOnlyThoseClasses("org.test.TestSupport", "org.test.TestSupport", "org.test.MockitoSampleTest"));
+
+        Assertions.assertThat(filtered).has(onlyThoseClasses("org.test.TestSupport", "org.test.TestSupport", "org.test.MockitoSampleTest"));
     }
     
     @Test
@@ -77,8 +79,8 @@ public class StackTraceFilterTest extends TestBase {
         ).toTraceArray();
         
         StackTraceElement[] filtered = filter.filter(t, false);
-        
-        assertThat(filtered, hasOnlyThoseClasses("org.test.MockitoSampleTest", "junit.stuff", "org.mockito.runners.Runner"));
+
+        Assertions.assertThat(filtered).has(onlyThoseClasses("org.test.MockitoSampleTest", "junit.stuff", "org.mockito.runners.Runner"));
     }
 
     @Test
@@ -94,7 +96,7 @@ public class StackTraceFilterTest extends TestBase {
 
         StackTraceElement[] filtered = filter.filter(t, false);
 
-        assertThat(filtered, hasOnlyThoseClasses("org.test.MockitoSampleTest", "junit.stuff", "org.mockito.runners.Runner","org.mockito.internal.junit.JUnitRule$1.evaluate(JUnitRule.java:16)"));
+        Assertions.assertThat(filtered).has(onlyThoseClasses("org.test.MockitoSampleTest", "junit.stuff", "org.mockito.runners.Runner","org.mockito.internal.junit.JUnitRule$1.evaluate(JUnitRule.java:16)"));
     }
     
     @Test
@@ -105,8 +107,8 @@ public class StackTraceFilterTest extends TestBase {
         ).toTraceArray();
         
         StackTraceElement[] filtered = filter.filter(t, false);
-        
-        assertThat(filtered, hasOnlyThoseClasses("org.test.MockitoSampleTest", "org.mockito.internal.runners.Runner"));
+
+        Assertions.assertThat(filtered).has(onlyThoseClasses("org.test.MockitoSampleTest", "org.mockito.internal.runners.Runner"));
     }
     
     @Test
@@ -122,7 +124,7 @@ public class StackTraceFilterTest extends TestBase {
         StackTraceElement[] filtered = filter.filter(t, true);
         
         //then
-        assertThat(filtered, hasOnlyThoseClasses("org.test.MockitoSampleTest", "org.test.Good"));
+        Assertions.assertThat(filtered).has(onlyThoseClasses("org.test.MockitoSampleTest", "org.test.Good"));
     }
 
     @Test
@@ -135,8 +137,8 @@ public class StackTraceFilterTest extends TestBase {
         ).toTraceArray();
         
         StackTraceElement[] filtered = filter.filter(t, true);
-        
-        assertThat(filtered, hasOnlyThoseClasses(
+
+        Assertions.assertThat(filtered).has(onlyThoseClasses(
                 "org.test.MockitoSampleTest",
                 "org.yet.another.good.Trace",
                 "org.good.Trace"

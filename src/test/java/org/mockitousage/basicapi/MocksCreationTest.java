@@ -6,23 +6,28 @@
 package org.mockitousage.basicapi;
 
 import org.junit.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.mockito.exceptions.base.MockitoException;
 import org.mockito.exceptions.verification.SmartNullPointerException;
+import org.mockito.internal.debugging.LocationImpl;
 import org.mockitousage.IMethods;
 import org.mockitoutil.TestBase;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
-import static org.hamcrest.CoreMatchers.is;
+import static junit.framework.TestCase.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 @SuppressWarnings("unchecked")
 public class MocksCreationTest extends TestBase {
 
-    private class HasPrivateConstructor {};
+    private class HasPrivateConstructor {}
     
     @Test
     public void shouldCreateMockWhenConstructorIsPrivate() {
@@ -41,7 +46,7 @@ public class MocksCreationTest extends TestBase {
         String name = mock.toString();
         
         //then
-        assertContains("great mockie", name);
+        assertThat(name).contains("great mockie");
         //and
         try {
             smartNull.simpleMethod();
@@ -60,7 +65,7 @@ public class MocksCreationTest extends TestBase {
         String name = mock.toString();
         
         //then
-        assertContains("great mockie", name);
+        assertThat(name).contains("great mockie");
         //and
         assertTrue(mock instanceof List);
     }
@@ -74,7 +79,7 @@ public class MocksCreationTest extends TestBase {
         String name = mock.toString();
         
         //then
-        assertContains("great mockie", name);
+        assertThat(name).contains("great mockie");
     }
     
     @Test

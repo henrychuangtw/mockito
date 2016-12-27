@@ -5,13 +5,6 @@
 
 package org.mockitousage.spies;
 
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
-
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-
 import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
@@ -21,11 +14,19 @@ import org.mockito.exceptions.verification.TooLittleActualInvocations;
 import org.mockito.exceptions.verification.VerificationInOrderFailure;
 import org.mockitoutil.TestBase;
 
-@SuppressWarnings("unchecked")
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+
+import static junit.framework.TestCase.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assume.assumeTrue;
+import static org.mockito.Mockito.*;
+
 public class SpyingOnRealObjectsTest extends TestBase {
 
-    List list = new LinkedList();
-    List spy = Mockito.spy(list);
+    List<String> list = new LinkedList<String>();
+    List<String> spy = Mockito.spy(list);
     
     @Test
     public void shouldVerify() {
@@ -67,13 +68,12 @@ public class SpyingOnRealObjectsTest extends TestBase {
         assertFalse(spy.contains("foo"));
     }
     
-    @SuppressWarnings("deprecation")
     @Test
     public void shouldStubVoid() {
-        stubVoid(spy)
-            .toReturn()
-            .toThrow(new RuntimeException())
-            .on().clear();
+        doNothing()
+        .doThrow(new RuntimeException())
+        .when(spy)
+        .clear();
 
         spy.add("one");
         spy.clear();
@@ -180,12 +180,13 @@ public class SpyingOnRealObjectsTest extends TestBase {
     
     @Test
     public void shouldSayNiceMessageWhenSpyingOnPrivateClass() throws Exception {
-        List real = Arrays.asList("first", "second");
+        List<String> real = Arrays.asList("first", "second");
         try {
-            spy(real);
+            List<String> spy = spy(real);
+            assumeTrue("Using inline mocks, it is possible to spy on private types", spy.getClass() != real.getClass());
             fail();
         } catch (MockitoException e) {
-            assertContains("Most likely it is a private class that is not visible by Mockito", e.getMessage());
+            assertThat(e).hasMessageContaining("Most likely it is due to mocking a private class that is not visible to Mockito");
         }
     }
 }

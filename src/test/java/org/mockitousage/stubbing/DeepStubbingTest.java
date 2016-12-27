@@ -4,29 +4,22 @@
  */
 package org.mockitousage.stubbing;
 
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.atLeast;
-import static org.mockito.Mockito.atMost;
-import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import java.io.ByteArrayOutputStream;
-import java.io.OutputStream;
-import java.net.Socket;
-import java.util.Locale;
-import javax.net.SocketFactory;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.exceptions.verification.TooManyActualInvocations;
 import org.mockitoutil.TestBase;
+
+import javax.net.SocketFactory;
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
+import java.net.Socket;
+import java.util.List;
+import java.util.Locale;
+
+import static junit.framework.TestCase.*;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.*;
 
 
 public class DeepStubbingTest extends TestBase {
@@ -72,7 +65,15 @@ public class DeepStubbingTest extends TestBase {
     }    
     
     static final class FinalClass {}
-    
+
+    interface First {
+        Second getSecond();
+
+        String getString();
+    }
+
+    interface Second extends List<String> {}
+
     @Test
     public void myTest() throws Exception {
         SocketFactory sf = mock(SocketFactory.class, RETURNS_DEEP_STUBS);
@@ -317,5 +318,12 @@ public class DeepStubbingTest extends TestBase {
         
         //then
         assertEquals(value, person.getFinalClass());
+    }
+
+    @Test
+    public void deep_stub_does_not_try_to_mock_generic_final_classes() {
+        First first = mock(First.class, RETURNS_DEEP_STUBS);
+        assertNull(first.getString());
+        assertNull(first.getSecond().get(0));
     }
 }

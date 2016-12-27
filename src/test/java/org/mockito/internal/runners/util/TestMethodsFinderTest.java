@@ -7,6 +7,9 @@ package org.mockito.internal.runners.util;
 import org.junit.Test;
 import org.mockitoutil.TestBase;
 
+import static junit.framework.TestCase.assertFalse;
+import static junit.framework.TestCase.assertTrue;
+
 public class TestMethodsFinderTest extends TestBase {
 
     public static class HasTests {
@@ -19,7 +22,7 @@ public class TestMethodsFinderTest extends TestBase {
 
     @Test
     public void shouldKnowWhenClassHasTests() {
-        assertTrue(new TestMethodsFinder().hasTestMethods(HasTests.class));
-        assertFalse(new TestMethodsFinder().hasTestMethods(DoesNotHaveTests.class));
+        assertTrue(TestMethodsFinder.hasTestMethods(HasTests.class));
+        assertFalse(TestMethodsFinder.hasTestMethods(DoesNotHaveTests.class));
     }
 }

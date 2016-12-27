@@ -30,14 +30,17 @@ import org.mockito.internal.verification.api.VerificationData;
  * See examples in javadoc for {@link Mockito#verify(Object, VerificationMode)}
  */
 public interface VerificationMode {
-    
+
+    /**
+     * Performs the verification
+     */
     void verify(VerificationData data);
     
     /**
      * Description will be prepended to the assertion error if verification fails.
      * @param description The custom failure message
      * @return VerificationMode
-     * @since 2.0.0
+     * @since 2.1.0
      */
     VerificationMode description(String description);
 }

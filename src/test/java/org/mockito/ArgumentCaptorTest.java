@@ -6,37 +6,31 @@ package org.mockito;
 
 import org.junit.After;
 import org.junit.Test;
-import org.mockito.internal.progress.HandyReturnValues;
-import org.mockitoutil.TestBase;
+import org.mockito.exceptions.misusing.InvalidUseOfMatchersException;
 
-@SuppressWarnings("unchecked")
-public class ArgumentCaptorTest extends TestBase {
-    
-    @Test
-    public void tell_handy_return_values_to_return_value_for() throws Exception {
-        //given
-        final Object expected = new Object(); 
-        ArgumentCaptor<Object> argumentCaptor = ArgumentCaptor.forClass(Object.class);
-        argumentCaptor.handyReturnValues = will_return(expected);
-        
-        //when
-        Object returned = argumentCaptor.capture();
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.validateMockitoUsage;
 
-        //then
-        assertEquals(expected, returned);
-    }
+public class ArgumentCaptorTest {
 
-    private HandyReturnValues will_return(final Object expected) {
-        return new HandyReturnValues() {
-            @Override
-            public <T> T returnFor(Class<T> clazz) {
-                return (T) expected;
-            }
-        };
-    }
+	/**
+	 * Clean up the internal Mockito-Stubbing state
+	 */
+	@After
+	public void tearDown() {
+		try {
+			validateMockitoUsage();
+		} catch (InvalidUseOfMatchersException ignore) {
+		}
+		
+	}
 
-    @After
-    public void yes_I_know_some_matchers_are_misplaced() {
-        resetState();
-    }
+	@Test
+	public void tell_handy_return_values_to_return_value_for() throws Exception {
+
+		ArgumentCaptor<Object> captor = ArgumentCaptor.forClass(Object.class);
+		assertThat(captor.capture()).isNull();
+
+	}
+
 }

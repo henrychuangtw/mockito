@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2016 Mockito contributors
+ * This program is made available under the terms of the MIT License.
+ */
 package org.mockito.internal.junit;
 
 import org.mockito.exceptions.verification.ArgumentsAreDifferent;
@@ -8,22 +12,21 @@ import org.mockito.exceptions.verification.ArgumentsAreDifferent;
  */
 class FriendlyExceptionMaker {
 
-    private final JUnitDetecter detecter;
+    private final JUnitDetector detector;
 
-    FriendlyExceptionMaker(JUnitDetecter detecter) {
-        this.detecter = detecter;
+    FriendlyExceptionMaker(JUnitDetector detector) {
+        this.detector = detector;
     }
 
     //TODO SF this can be now unit tested
     public AssertionError createArgumentsAreDifferentException(String message, String wanted, String actual)  {
-        if (!detecter.hasJUnit()) {
+        if (!detector.hasJUnit()) {
             return new ArgumentsAreDifferent(message);
         }
 
         try {
             Class<?> clazz = Class.forName("org.mockito.exceptions.verification.junit.ArgumentsAreDifferent");
-            AssertionError throwable = (AssertionError) clazz.getConstructors()[0].newInstance(message, wanted, actual);
-            return throwable;
+            return (AssertionError) clazz.getConstructors()[0].newInstance(message, wanted, actual);
         } catch (Throwable t) {
 //            throw the default exception in case of problems
             return new ArgumentsAreDifferent(message);

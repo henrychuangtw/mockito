@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2016 Mockito contributors
+ * This program is made available under the terms of the MIT License.
+ */
 package org.mockito.internal.matchers.text;
 
 /**
@@ -6,7 +10,7 @@ package org.mockito.internal.matchers.text;
  */
 class FormattedText {
 
-    private String text;
+    private final String text;
 
     public FormattedText(String text) {
         this.text = text;

@@ -5,6 +5,7 @@
 
 package org.mockito.internal.util.collections;
 
+import org.assertj.core.api.Assertions;
 import org.junit.Test;
 import org.mockito.internal.util.collections.ListUtil.Filter;
 import org.mockitoutil.TestBase;
@@ -13,27 +14,26 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static java.util.Arrays.asList;
-import static org.mockitoutil.ExtraMatchers.hasExactlyInOrder;
+import static junit.framework.TestCase.assertTrue;
 
-@SuppressWarnings("unchecked")
 public class ListUtilTest extends TestBase {
 
     @Test
     public void shouldFilterList() throws Exception {
-        List list = asList("one", "x", "two", "x", "three");
-        List filtered = ListUtil.filter(list, new Filter() {
-            public boolean isOut(Object object) {
+        List<String> list = asList("one", "x", "two", "x", "three");
+        List<String> filtered = ListUtil.filter(list, new Filter<String>() {
+            public boolean isOut(String object) {
                 return object == "x";
             }
         });
-        
-        assertThat(filtered, hasExactlyInOrder("one", "two", "three"));
+
+        Assertions.assertThat(filtered).containsSequence("one", "two", "three");
     }
     
     @Test
     public void shouldReturnEmptyIfEmptyListGiven() throws Exception {
-        List list = new LinkedList();
-        List filtered = ListUtil.filter(list, null);
+        List<Object> list = new LinkedList<Object>();
+        List<Object> filtered = ListUtil.filter(list, null);
         assertTrue(filtered.isEmpty());
     }
 }

@@ -4,24 +4,23 @@
  */
 package org.mockitousage.junitrunner;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
-import static org.mockitousage.junitrunner.Filters.*;
-
-import java.util.List;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
+
+import java.util.List;
+
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.verify;
+import static org.mockitousage.junitrunner.Filters.methodNameContains;
 
 @RunWith(MockitoJUnitRunner.class)
-@SuppressWarnings("unchecked")
 public class JUnit45RunnerTest {
 
     @InjectMocks private ListDependent listDependent = new ListDependent();
-    @Mock private List list;
+    @Mock private List<String> list;
 
     @Test
     public void shouldInitMocksUsingRunner() {
@@ -45,9 +44,9 @@ public class JUnit45RunnerTest {
     }
 
     class ListDependent {
-        private List list;
+        private List<?> list;
 
-        public List getList() {
+        public List<?> getList() {
             return list;
         }
     }

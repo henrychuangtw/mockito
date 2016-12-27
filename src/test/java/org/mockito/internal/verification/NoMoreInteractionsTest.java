@@ -11,7 +11,6 @@ import org.mockito.exceptions.verification.VerificationInOrderFailure;
 import org.mockito.internal.creation.MockSettingsImpl;
 import org.mockito.internal.invocation.InvocationBuilder;
 import org.mockito.internal.invocation.InvocationMatcher;
-import org.mockito.internal.progress.ThreadSafeMockingProgress;
 import org.mockito.internal.stubbing.InvocationContainerImpl;
 import org.mockito.internal.verification.api.VerificationDataInOrderImpl;
 import org.mockito.invocation.Invocation;
@@ -19,6 +18,7 @@ import org.mockitousage.IMethods;
 import org.mockitoutil.TestBase;
 
 import static java.util.Arrays.asList;
+import static junit.framework.TestCase.*;
 import static org.mockito.Mockito.mock;
 
 public class NoMoreInteractionsTest extends TestBase {
@@ -89,7 +89,7 @@ public class NoMoreInteractionsTest extends TestBase {
         InvocationMatcher i = new InvocationBuilder().mock(mock).toInvocationMatcher();
 
         InvocationContainerImpl invocations =
-            new InvocationContainerImpl(new ThreadSafeMockingProgress(), new MockSettingsImpl());
+            new InvocationContainerImpl( new MockSettingsImpl());
         invocations.setInvocationForPotentialStubbing(i);
 
         try {

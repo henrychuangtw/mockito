@@ -47,15 +47,15 @@ public class TestBase {
     public void init() {
         MockitoAnnotations.initMocks(this);
     }
-    
+
     public static void makeStackTracesClean() {
         ConfigurationAccess.getConfig().overrideCleansStackTrace(true);
     }
-    
+
     public void resetState() {
         new StateMaster().reset();
     }
-    
+
     protected Invocation getLastInvocation() {
         return new MockitoCore().getLastInvocation();
     }
@@ -100,7 +100,7 @@ public class TestBase {
      * into:
      * blah blah (UnusedStubsExceptionMessageTest.java:0)
      */
-    protected String filterLineNo(String stackTrace) {
+    public static String filterLineNo(String stackTrace) {
         return stackTrace.replaceAll("(\\((\\w+\\.java):(\\d)+\\))", "($2:0)");
     }
 }

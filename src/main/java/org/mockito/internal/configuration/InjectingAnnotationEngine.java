@@ -4,23 +4,21 @@
  */
 package org.mockito.internal.configuration;
 
-import org.mockito.*;
-import org.mockito.configuration.AnnotationEngine;
-import org.mockito.internal.configuration.injection.scanner.InjectMocksScanner;
-import org.mockito.internal.configuration.injection.scanner.MockScanner;
-
 import java.lang.reflect.Field;
 import java.util.HashSet;
 import java.util.Set;
+import org.mockito.MockitoAnnotations;
+import org.mockito.internal.configuration.injection.scanner.InjectMocksScanner;
+import org.mockito.internal.configuration.injection.scanner.MockScanner;
+import org.mockito.plugins.AnnotationEngine;
 
 import static org.mockito.internal.util.collections.Sets.newMockSafeHashSet;
 
 /**
  * See {@link MockitoAnnotations}
  */
-@SuppressWarnings({"deprecation", "unchecked"})
-public class InjectingAnnotationEngine implements AnnotationEngine {
-    private final AnnotationEngine delegate = new DefaultAnnotationEngine();
+public class InjectingAnnotationEngine implements AnnotationEngine, org.mockito.configuration.AnnotationEngine {
+    private final AnnotationEngine delegate = new IndependentAnnotationEngine();
     private final AnnotationEngine spyAnnotationEngine = new SpyAnnotationEngine();
 
     /**
@@ -37,7 +35,7 @@ public class InjectingAnnotationEngine implements AnnotationEngine {
      * @param clazz Not used
      * @param testInstance The instance of the test, should not be null.
      *
-     * @see org.mockito.configuration.AnnotationEngine#process(Class, Object)
+     * @see org.mockito.plugins.AnnotationEngine#process(Class, Object)
      */
     public void process(Class<?> clazz, Object testInstance) {
         processIndependentAnnotations(testInstance.getClass(), testInstance);
@@ -70,7 +68,7 @@ public class InjectingAnnotationEngine implements AnnotationEngine {
      * &#064;InjectMocks for given testClassInstance.
      * <p>
      * See examples in javadoc for {@link MockitoAnnotations} class.
-     * 
+     *
      * @param testClassInstance
      *            Test class, usually <code>this</code>
      */
@@ -78,14 +76,14 @@ public class InjectingAnnotationEngine implements AnnotationEngine {
         Class<?> clazz = testClassInstance.getClass();
         Set<Field> mockDependentFields = new HashSet<Field>();
         Set<Object> mocks = newMockSafeHashSet();
-        
+
         while (clazz != Object.class) {
             new InjectMocksScanner(clazz).addTo(mockDependentFields);
             new MockScanner(testClassInstance, clazz).addPreparedMocks(mocks);
             onInjection(testClassInstance, clazz, mockDependentFields, mocks);
             clazz = clazz.getSuperclass();
         }
-        
+
         new DefaultInjectionEngine().injectMocksOnFields(mockDependentFields, mocks, testClassInstance);
     }
 

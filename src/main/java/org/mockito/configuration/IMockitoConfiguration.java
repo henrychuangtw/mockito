@@ -11,7 +11,7 @@ import org.mockito.stubbing.Answer;
  *
  * <p>
  * In most cases you don't really need to configure Mockito. For example in case of working with legacy code,
- * when you might want to have different 'mocking style' this interface might be helpful. 
+ * when you might want to have different 'mocking style' this interface might be helpful.
  * A reason of configuring Mockito might be if you disagree with the {@link org.mockito.Answers#RETURNS_DEFAULTS}
  * unstubbed mocks return.
  *
@@ -41,14 +41,25 @@ public interface IMockitoConfiguration {
      * Allows configuring the default answers of unstubbed invocations
      * <p>
      * See javadoc for {@link IMockitoConfiguration}
-     */    
+     */
     Answer<Object> getDefaultAnswer();
 
     /**
-     * Configures annotations for mocks
+     * Configures annotations for mocks.
+     *
+     * <p>
+     * This method will have lower priority that the new extension mechanism.
+     * That is if it exists on the classpath both a class <code>org.mockito.configuration.MockitoConfiguration</code>
+     * and a file <code>mockito-extensions/org.mockito.plugins.AnnotationEngine</code> then the implementation of
+     * <code>org.mockito.configuration.MockitoConfiguration</code> will be chosen instead of the one in the file.
+     *
      * <p>
      * See javadoc for {@link IMockitoConfiguration}
+     *
+     * @deprecated Please use the extension mechanism {@link org.mockito.plugins.AnnotationEngine} instead,
+     *             this method will probably be removed in mockito 3.
      */
+    @Deprecated
     AnnotationEngine getAnnotationEngine();
 
     /**
@@ -57,13 +68,13 @@ public interface IMockitoConfiguration {
      * Mockito developers)
      * <p>
      * See javadoc for {@link IMockitoConfiguration}
-     * 
+     *
      * @return if Mockito should clean stack traces
      */
     boolean cleansStackTrace();
-    
+
     /**
-     * Allow objenesis to cache classes. If you're in an environment where classes 
+     * Allow objenesis to cache classes. If you're in an environment where classes
      * are dynamically reloaded, you can disable this to avoid classcast exceptions.
      */
     boolean enableClassCache();

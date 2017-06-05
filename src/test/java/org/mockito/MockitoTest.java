@@ -12,11 +12,12 @@ import static org.mockito.internal.progress.ThreadSafeMockingProgress.mockingPro
 import java.util.List;
 import org.junit.Test;
 import org.mockito.exceptions.misusing.NotAMockException;
+import org.mockito.exceptions.misusing.NullInsteadOfMockException;
 import org.mockito.internal.creation.MockSettingsImpl;
 
 @SuppressWarnings("unchecked")
 public class MockitoTest {
-	
+
     @Test
     public void shouldRemoveStubbableFromProgressAfterStubbing() {
         List mock = Mockito.mock(List.class);
@@ -24,39 +25,49 @@ public class MockitoTest {
         //TODO Consider to move to separate test
         assertThat(mockingProgress().pullOngoingStubbing()).isNull();
     }
-    
+
     @Test(expected=NotAMockException.class)
     public void shouldValidateMockWhenVerifying() {
         Mockito.verify("notMock");
     }
-    
+
     @Test(expected=NotAMockException.class)
     public void shouldValidateMockWhenVerifyingWithExpectedNumberOfInvocations() {
         Mockito.verify("notMock", times(19));
     }
-    
+
     @Test(expected=NotAMockException.class)
     public void shouldValidateMockWhenVerifyingNoMoreInteractions() {
         Mockito.verifyNoMoreInteractions("notMock");
     }
-    
+
     @Test(expected=NotAMockException.class)
     public void shouldValidateMockWhenVerifyingZeroInteractions() {
         Mockito.verifyZeroInteractions("notMock");
     }
-    
+
+    @Test(expected=NotAMockException.class)
+    public void shouldValidateMockWhenVerifyingNoInteractions() {
+        Mockito.verifyNoInteractions("notMock");
+    }
+
+    @Test(expected=NullInsteadOfMockException.class)
+    public void shouldValidateNullMockWhenVerifyingNoInteractions() {
+        Mockito.verifyNoInteractions(new Object[] { null });
+    }
+
     @Test(expected=NotAMockException.class)
     public void shouldValidateMockWhenCreatingInOrderObject() {
         Mockito.inOrder("notMock");
     }
-    
+
     @Test
     public void shouldStartingMockSettingsContainDefaultBehavior() {
         //when
         MockSettingsImpl<?> settings = (MockSettingsImpl<?>) Mockito.withSettings();
-        
+
         //then
         assertThat(Mockito.RETURNS_DEFAULTS).isEqualTo(settings.getDefaultAnswer());
     }
-    
+
 }

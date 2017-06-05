@@ -8,7 +8,7 @@ package org.mockito.internal.verification;
 import org.mockito.verification.VerificationMode;
 
 public class VerificationModeFactory {
-    
+
     public static VerificationMode atLeastOnce() {
         return atLeast(1);
     }
@@ -33,10 +33,14 @@ public class VerificationModeFactory {
         return new NoMoreInteractions();
     }
 
+    public static NoInteractions noInteractions() {
+        return new NoInteractions();
+    }
+
     public static VerificationMode atMost(int maxNumberOfInvocations) {
         return new AtMost(maxNumberOfInvocations);
     }
-    
+
     /**
      * Verification mode will prepend the specified failure message if verification fails with the given implementation.
      * @param mode Implementation used for verification

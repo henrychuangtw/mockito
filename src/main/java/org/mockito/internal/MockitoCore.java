@@ -19,13 +19,16 @@ import static org.mockito.internal.util.MockUtil.getMockHandler;
 import static org.mockito.internal.util.MockUtil.isMock;
 import static org.mockito.internal.util.MockUtil.resetMock;
 import static org.mockito.internal.util.MockUtil.typeMockabilityOf;
+import static org.mockito.internal.verification.VerificationModeFactory.noInteractions;
 import static org.mockito.internal.verification.VerificationModeFactory.noMoreInteractions;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import org.mockito.InOrder;
 import org.mockito.MockSettings;
 import org.mockito.MockingDetails;
+import org.mockito.exceptions.base.MockitoException;
 import org.mockito.exceptions.misusing.NotAMockException;
 import org.mockito.internal.creation.MockSettingsImpl;
 import org.mockito.internal.invocation.finder.VerifiableInvocationsFinder;
@@ -34,7 +37,6 @@ import org.mockito.internal.stubbing.InvocationContainer;
 import org.mockito.internal.stubbing.OngoingStubbingImpl;
 import org.mockito.internal.stubbing.StubberImpl;
 import org.mockito.internal.util.DefaultMockingDetails;
-import org.mockito.internal.util.MockUtil;
 import org.mockito.internal.verification.MockAwareVerificationMode;
 import org.mockito.internal.verification.VerificationDataImpl;
 import org.mockito.internal.verification.VerificationModeFactory;
@@ -42,6 +44,7 @@ import org.mockito.internal.verification.api.InOrderContext;
 import org.mockito.internal.verification.api.VerificationDataInOrder;
 import org.mockito.internal.verification.api.VerificationDataInOrderImpl;
 import org.mockito.invocation.Invocation;
+import org.mockito.listeners.VerificationListener;
 import org.mockito.mock.MockCreationSettings;
 import org.mockito.stubbing.OngoingStubbing;
 import org.mockito.stubbing.Stubber;
@@ -86,7 +89,7 @@ public class MockitoCore {
         }
         MockingProgress mockingProgress = mockingProgress();
         VerificationMode actualMode = mockingProgress.maybeVerifyLazily(mode);
-        mockingProgress.verificationStarted(new MockAwareVerificationMode(mock, actualMode));
+        mockingProgress.verificationStarted(new MockAwareVerificationMode(mock, actualMode, mockingProgress.verificationListeners()));
         return mock;
     }
 
@@ -135,6 +138,28 @@ public class MockitoCore {
         VerificationModeFactory.noMoreInteractions().verifyInOrder(data);
     }
 
+    /**
+     * Verifies that given mocks have been invoked zero times, failing otherwise
+     *
+     * @since 3.0.0
+     * @param mocks the mocks to verify
+     */
+    public void verifyNoInteractions(Object... mocks) {
+        assertMocksNotEmpty(mocks);
+        mockingProgress().validateState();
+        for (Object mock : mocks) {
+            if (mock == null) {
+                throw nullPassedToVerifyNoMoreInteractions();
+            }
+            if (!isMock(mock)) {
+                throw notAMockPassedToVerifyNoMoreInteractions();
+            }
+            InvocationContainer invocations = getMockHandler(mock).getInvocationContainer();
+            VerificationDataImpl data = new VerificationDataImpl(invocations, null);
+            noInteractions().verify(data);
+        }
+    }
+
     private void assertMocksNotEmpty(Object[] mocks) {
         if (mocks == null || mocks.length == 0) {
             throw mocksHaveToBePassedToVerifyNoMoreInteractions();
@@ -169,7 +194,7 @@ public class MockitoCore {
 
     /**
      * For testing purposes only. Is not the part of main API.
-     * 
+     *
      * @return last invocation
      */
     public Invocation getLastInvocation() {

@@ -16,7 +16,7 @@ import org.junit.runner.notification.RunNotifier;
 import org.mockito.internal.debugging.WarningsCollector;
 import org.mockito.internal.junit.util.JUnitFailureHacker;
 import org.mockito.internal.runners.RunnerFactory;
-import org.mockito.internal.runners.RunnerImpl;
+import org.mockito.internal.runners.InternalRunner;
 
 /**
  * @deprecated as of 2.1.0. Use the {@link org.mockito.junit.MockitoJUnitRunner} runner instead
@@ -27,34 +27,34 @@ import org.mockito.internal.runners.RunnerImpl;
 @Deprecated
 public class VerboseMockitoJUnitRunner extends Runner implements Filterable {
 
-    private final RunnerImpl runner;
+    private final InternalRunner runner;
 
     public VerboseMockitoJUnitRunner(Class<?> klass) throws InvocationTargetException {
         this(new RunnerFactory().create(klass));
     }
-    
-    VerboseMockitoJUnitRunner(RunnerImpl runnerImpl) {
-        this.runner = runnerImpl;
+
+    VerboseMockitoJUnitRunner(InternalRunner runner) {
+        this.runner = runner;
     }
-    
+
     @Override
-    public void run(RunNotifier notifier) {        
+    public void run(RunNotifier notifier) {
 
         //a listener that changes the failure's exception in a very hacky way...
         RunListener listener = new RunListener() {
-            
+
             WarningsCollector warningsCollector;
-                       
+
             @Override
             public void testStarted(Description description) throws Exception {
                 warningsCollector = new WarningsCollector();
             }
-            
+
             @Override
             @SuppressWarnings("deprecation")
-            public void testFailure(final Failure failure) throws Exception {       
+            public void testFailure(final Failure failure) throws Exception {
                 String warnings = warningsCollector.getWarnings();
-                new JUnitFailureHacker().appendWarnings(failure, warnings);                              
+                new JUnitFailureHacker().appendWarnings(failure, warnings);
             }
         };
 
@@ -67,7 +67,7 @@ public class VerboseMockitoJUnitRunner extends Runner implements Filterable {
     public Description getDescription() {
         return runner.getDescription();
     }
-    
+
     public void filter(Filter filter) throws NoTestsRemainException {
         //filter is required because without it UnrootedTests show up in Eclipse
         runner.filter(filter);
